@@ -1,0 +1,546 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		BBB1859A306F0BAF00996F4D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BBB18584306F0BAE00996F4D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBB1858B306F0BAE00996F4D;
+			remoteInfo = AdventureWorksMobile;
+		};
+		BBB185A4306F0BAF00996F4D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BBB18584306F0BAE00996F4D /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BBB1858B306F0BAE00996F4D;
+			remoteInfo = AdventureWorksMobile;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		BBB1858C306F0BAE00996F4D /* AdventureWorksMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AdventureWorksMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBB18599306F0BAF00996F4D /* AdventureWorksMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdventureWorksMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BBB185A3306F0BAF00996F4D /* AdventureWorksMobileUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AdventureWorksMobileUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		BBB1858E306F0BAE00996F4D /* AdventureWorksMobile */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AdventureWorksMobile;
+			sourceTree = "<group>";
+		};
+		BBB1859C306F0BAF00996F4D /* AdventureWorksMobileTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AdventureWorksMobileTests;
+			sourceTree = "<group>";
+		};
+		BBB185A6306F0BAF00996F4D /* AdventureWorksMobileUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = AdventureWorksMobileUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BBB18589306F0BAE00996F4D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		BBB18596306F0BAF00996F4D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		BBB185A0306F0BAF00996F4D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BBB18583306F0BAE00996F4D = {
+			isa = PBXGroup;
+			children = (
+				BBB1858E306F0BAE00996F4D /* AdventureWorksMobile */,
+				BBB1859C306F0BAF00996F4D /* AdventureWorksMobileTests */,
+				BBB185A6306F0BAF00996F4D /* AdventureWorksMobileUITests */,
+				BBB1858D306F0BAE00996F4D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BBB1858D306F0BAE00996F4D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BBB1858C306F0BAE00996F4D /* AdventureWorksMobile.app */,
+				BBB18599306F0BAF00996F4D /* AdventureWorksMobileTests.xctest */,
+				BBB185A3306F0BAF00996F4D /* AdventureWorksMobileUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BBB1858B306F0BAE00996F4D /* AdventureWorksMobile */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBB185AB306F0BAF00996F4D /* Build configuration list for PBXNativeTarget "AdventureWorksMobile" */;
+			buildPhases = (
+				BBB18588306F0BAE00996F4D /* Sources */,
+				BBB18589306F0BAE00996F4D /* Frameworks */,
+				BBB1858A306F0BAE00996F4D /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				BBB1858E306F0BAE00996F4D /* AdventureWorksMobile */,
+			);
+			name = AdventureWorksMobile;
+			productName = AdventureWorksMobile;
+			productReference = BBB1858C306F0BAE00996F4D /* AdventureWorksMobile.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BBB18598306F0BAF00996F4D /* AdventureWorksMobileTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBB185AE306F0BAF00996F4D /* Build configuration list for PBXNativeTarget "AdventureWorksMobileTests" */;
+			buildPhases = (
+				BBB18595306F0BAF00996F4D /* Sources */,
+				BBB18596306F0BAF00996F4D /* Frameworks */,
+				BBB18597306F0BAF00996F4D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BBB1859B306F0BAF00996F4D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BBB1859C306F0BAF00996F4D /* AdventureWorksMobileTests */,
+			);
+			name = AdventureWorksMobileTests;
+			productName = AdventureWorksMobileTests;
+			productReference = BBB18599306F0BAF00996F4D /* AdventureWorksMobileTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		BBB185A2306F0BAF00996F4D /* AdventureWorksMobileUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BBB185B1306F0BAF00996F4D /* Build configuration list for PBXNativeTarget "AdventureWorksMobileUITests" */;
+			buildPhases = (
+				BBB1859F306F0BAF00996F4D /* Sources */,
+				BBB185A0306F0BAF00996F4D /* Frameworks */,
+				BBB185A1306F0BAF00996F4D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BBB185A5306F0BAF00996F4D /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				BBB185A6306F0BAF00996F4D /* AdventureWorksMobileUITests */,
+			);
+			name = AdventureWorksMobileUITests;
+			productName = AdventureWorksMobileUITests;
+			productReference = BBB185A3306F0BAF00996F4D /* AdventureWorksMobileUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BBB18584306F0BAE00996F4D /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					BBB1858B306F0BAE00996F4D = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					BBB18598306F0BAF00996F4D = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = BBB1858B306F0BAE00996F4D;
+					};
+					BBB185A2306F0BAF00996F4D = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = BBB1858B306F0BAE00996F4D;
+					};
+				};
+			};
+			buildConfigurationList = BBB18587306F0BAE00996F4D /* Build configuration list for PBXProject "AdventureWorksMobile" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BBB18583306F0BAE00996F4D;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BBB1858D306F0BAE00996F4D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BBB1858B306F0BAE00996F4D /* AdventureWorksMobile */,
+				BBB18598306F0BAF00996F4D /* AdventureWorksMobileTests */,
+				BBB185A2306F0BAF00996F4D /* AdventureWorksMobileUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BBB1858A306F0BAE00996F4D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		BBB18597306F0BAF00996F4D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		BBB185A1306F0BAF00996F4D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BBB18588306F0BAE00996F4D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		BBB18595306F0BAF00996F4D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		BBB1859F306F0BAF00996F4D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BBB1859B306F0BAF00996F4D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBB1858B306F0BAE00996F4D /* AdventureWorksMobile */;
+			targetProxy = BBB1859A306F0BAF00996F4D /* PBXContainerItemProxy */;
+		};
+		BBB185A5306F0BAF00996F4D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BBB1858B306F0BAE00996F4D /* AdventureWorksMobile */;
+			targetProxy = BBB185A4306F0BAF00996F4D /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		BBB185A9306F0BAF00996F4D /* Debug configuration for PBXProject "AdventureWorksMobile" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		BBB185AA306F0BAF00996F4D /* Release configuration for PBXProject "AdventureWorksMobile" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BBB185AC306F0BAF00996F4D /* Debug configuration for PBXNativeTarget "AdventureWorksMobile" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.group5.AdventureWorksMobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BBB185AD306F0BAF00996F4D /* Release configuration for PBXNativeTarget "AdventureWorksMobile" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.group5.AdventureWorksMobile;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		BBB185AF306F0BAF00996F4D /* Debug configuration for PBXNativeTarget "AdventureWorksMobileTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.group5.AdventureWorksMobileTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AdventureWorksMobile.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AdventureWorksMobile";
+			};
+			name = Debug;
+		};
+		BBB185B0306F0BAF00996F4D /* Release configuration for PBXNativeTarget "AdventureWorksMobileTests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.group5.AdventureWorksMobileTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AdventureWorksMobile.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AdventureWorksMobile";
+			};
+			name = Release;
+		};
+		BBB185B2306F0BAF00996F4D /* Debug configuration for PBXNativeTarget "AdventureWorksMobileUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.group5.AdventureWorksMobileUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = AdventureWorksMobile;
+			};
+			name = Debug;
+		};
+		BBB185B3306F0BAF00996F4D /* Release configuration for PBXNativeTarget "AdventureWorksMobileUITests" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.group5.AdventureWorksMobileUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = AdventureWorksMobile;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BBB18587306F0BAE00996F4D /* Build configuration list for PBXProject "AdventureWorksMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBB185A9306F0BAF00996F4D /* Debug configuration for PBXProject "AdventureWorksMobile" */,
+				BBB185AA306F0BAF00996F4D /* Release configuration for PBXProject "AdventureWorksMobile" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		BBB185AB306F0BAF00996F4D /* Build configuration list for PBXNativeTarget "AdventureWorksMobile" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBB185AC306F0BAF00996F4D /* Debug configuration for PBXNativeTarget "AdventureWorksMobile" */,
+				BBB185AD306F0BAF00996F4D /* Release configuration for PBXNativeTarget "AdventureWorksMobile" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		BBB185AE306F0BAF00996F4D /* Build configuration list for PBXNativeTarget "AdventureWorksMobileTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBB185AF306F0BAF00996F4D /* Debug configuration for PBXNativeTarget "AdventureWorksMobileTests" */,
+				BBB185B0306F0BAF00996F4D /* Release configuration for PBXNativeTarget "AdventureWorksMobileTests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		BBB185B1306F0BAF00996F4D /* Build configuration list for PBXNativeTarget "AdventureWorksMobileUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BBB185B2306F0BAF00996F4D /* Debug configuration for PBXNativeTarget "AdventureWorksMobileUITests" */,
+				BBB185B3306F0BAF00996F4D /* Release configuration for PBXNativeTarget "AdventureWorksMobileUITests" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BBB18584306F0BAE00996F4D /* Project object */;
+	validationLevel = 1;
+}
