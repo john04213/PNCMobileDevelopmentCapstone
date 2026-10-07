@@ -22,7 +22,7 @@ class InventoryElement: Identifiable, Hashable, Codable {
     let quantity: Int
     
     enum CodingKeys: String, CodingKey {
-        case id = "productID"
+        case id = "productId"
         case productName
         case productNumber
         case safetyStockLevel
