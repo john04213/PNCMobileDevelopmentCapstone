@@ -175,7 +175,7 @@ class RemoteRepositoryBase<Item: Codable> {
                 
                 // create a copy of the original request, as it is a let constant
                 var newRequest = request
-                newRequest.setValue("Baerer \(authStatus.authToken!)", forHTTPHeaderField: "Authorization")
+                newRequest.setValue("Bearer \(authStatus.authToken!)", forHTTPHeaderField: "Authorization")
                 
                 return try await executeRequest(newRequest, isRetry: true)
                 
