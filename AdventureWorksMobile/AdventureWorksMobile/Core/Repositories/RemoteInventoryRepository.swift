@@ -23,9 +23,12 @@ class RemoteInventoryRepository: RemoteRepositoryBase<InventoryElement>, Reposit
         
     }
     
-    func getbyId(_ id: Int) async throws -> InventoryElement? {
+    func getbyId(_ id: String) async throws -> InventoryElement? {
         
-        let urlString = "\(urlBase)/Inventory/\(id)"
+        let dashIndex = id.firstIndex(of: "-")!
+        let section = id[...dashIndex].trimmingCharacters(in: .whitespaces)
+        
+        let urlString = "\(urlBase)/Inventory/\(section)"
         return try await fetchOne(urlString)
         
     }

@@ -18,8 +18,11 @@ struct AdventureWorksMobileApp: View {
         NavigationStack {
             VStack {
                 switch current {
+                case "products":
+                    ProductListView(repository: productRepository)
+                        .accessibilityIdentifier("productView")
                 case "inventory":
-                    InventoryList(repository1: productRepository, repository2: inventoryRepository)
+                    InventoryList(repository: inventoryRepository)
                         .accessibilityIdentifier("inventoryView")
                 default:
                     WelcomeView()
@@ -29,6 +32,10 @@ struct AdventureWorksMobileApp: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
+                        Button("Products") {
+                            current = "products"
+                        }
+                        .accessibilityIdentifier("productsViewButton")
                         Button("Inventory") {
                             current = "inventory"
                         }
