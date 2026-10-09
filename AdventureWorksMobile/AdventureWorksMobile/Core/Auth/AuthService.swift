@@ -7,7 +7,7 @@
 
 import Foundation
 
-class AuthService {
+class AuthService: AuthServiceProtocol {
     
     // use the Singleton pattern
     // static allows us to call
