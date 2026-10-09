@@ -10,7 +10,7 @@ import Foundation
 
 class InventoryElement: Identifiable, Hashable, Codable {
     
-    let id: Int
+    let productId: Int
     let productName: String
     let productNumber: String
     let safetyStockLevel: Int
@@ -21,21 +21,12 @@ class InventoryElement: Identifiable, Hashable, Codable {
     let bin: Int
     let quantity: Int
     
-    enum CodingKeys: String, CodingKey {
-        case id = "productID"
-        case productName
-        case productNumber
-        case safetyStockLevel
-        case reorderPoint
-        case locationId
-        case locationName
-        case shelf
-        case bin
-        case quantity
+    var id: String {
+        "\(productId) - \(locationName) - \(shelf) - \(bin)"
     }
     
-    init(id: Int, productName: String, productNumber: String, safetyStockLevel: Int, reorderPoint: Int, locationId: Int, locationName: String, shelf: String, bin: Int, quantity: Int) {
-        self.id = id
+    init(productId: Int, productName: String, productNumber: String, safetyStockLevel: Int, reorderPoint: Int, locationId: Int, locationName: String, shelf: String, bin: Int, quantity: Int) {
+        self.productId = productId
         self.productName = productName
         self.productNumber = productNumber
         self.safetyStockLevel = safetyStockLevel

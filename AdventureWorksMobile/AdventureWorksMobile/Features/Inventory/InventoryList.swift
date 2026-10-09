@@ -10,8 +10,8 @@ import SwiftUI
 struct InventoryList: View {
     @State private var viewModel: ViewModel
     
-    init(repository1: any RepositoryProtocol<ProductElement>, repository2: any RepositoryProtocol<InventoryElement>) {
-        viewModel = ViewModel(repository1: repository1, repository2: repository2)
+    init(repository: any RepositoryProtocol<InventoryElement>) {
+        viewModel = ViewModel(repository: repository)
     }
     
     var body: some View {
@@ -23,48 +23,22 @@ struct InventoryList: View {
             }
             HStack {
                 Text("Filter")
-                TextField("Product Name", text: $viewModel.filter)
-                Image(systemName: "arrow.clockwise")
-                    .frame(width: 20, height: 20)
+                TextField("Product Name or Location", text: $viewModel.filter)
             }
             .padding()
             List(viewModel.matchingProducts) { product in
-                HStack(alignment: .center) {
-                    Base64GifView(base64String: product.thumbnailPhoto)
-                        .frame(width: 100, height: 67)
+                HStack (alignment: .center) {
                     VStack(alignment: .leading) {
-                        Text("\(product.id) - \(product.name)")
+                        Text(product.productName)
                             .lineLimit(1)
-                        if let summ = product.summary {
-                            Text(summ)
-                                .lineLimit(1)
-                                .foregroundStyle(.secondary)
-                        } else {
-                            Text("...")
-                        }
-                        HStack {
-                            Text("Price:")
-                            Text(String(format: "$%.2f", product.listPrice))
-                        }
-                    }
-                }
-                .onTapGesture {
-                    self.viewModel.selectedProduct = product
-                }
-            }
-            if let selected = viewModel.selectedProduct {
-                VStack(alignment: .leading) {
-                    Text(selected.name)
-                        .font(Font.title2)
-                    if let summ = selected.summary {
-                        Text(summ)
-                            .font(.caption)
+                        Text("\(product.locationName) · Shelf \(product.shelf) · Bin \(product.bin)")
+                            .lineLimit(1)
                             .foregroundStyle(.secondary)
-                            .padding(5)
                     }
+                    Spacer()
+                    Text("\(product.quantity)")
                 }
             }
-            
         }
         .task {
             await viewModel.loadProducts()
@@ -77,45 +51,36 @@ extension InventoryList {
     @Observable
     class ViewModel {
         
-        let repository1: any RepositoryProtocol<ProductElement>
-        let repository2: any RepositoryProtocol<InventoryElement>
+        let repository: any RepositoryProtocol<InventoryElement>
         
-        init(repository1: any RepositoryProtocol<ProductElement>, repository2: any RepositoryProtocol<InventoryElement>) {
-            self.repository1 = repository1
-            self.repository2 = repository2
+        init(repository: any RepositoryProtocol<InventoryElement>) {
+            self.repository = repository
         }
         
         var errorMessage = ""
         
-        var products: [ProductElement] = [] {
+        var products: [InventoryElement] = [] {
             didSet {
                 filter = ""
-                selectedProduct = nil
             }
         }
         var filter: String = "" {
             didSet {
                 matchingProducts = products.filter { product in
                     filter == "" ||
-                    product.name.lowercased()
+                    product.productName.lowercased()
+                        .contains(filter.lowercased()) ||
+                    product.locationName.lowercased()
                         .contains(filter.lowercased())
                 }
             }
         }
-        var matchingProducts: [ProductElement] = [] {
-            didSet {
-                if let selected = selectedProduct,
-                   !matchingProducts.contains(selected) {
-                    selectedProduct = nil
-                }
-            }
-        }
-        var selectedProduct: ProductElement? = nil
+        var matchingProducts: [InventoryElement] = []
         
         func loadProducts() async {
             errorMessage = ""
             do {
-                products = try await repository1.getAll()
+                products = try await repository.getAll()
             } catch {
                 errorMessage = "\(error)"
             }

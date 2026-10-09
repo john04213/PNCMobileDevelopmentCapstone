@@ -5,11 +5,13 @@
 //  Created by Miles Eidson on 10/1/26.
 //
 
+import Foundation
+
 class MockInventoryRepository: RepositoryProtocol {
     
     private var inventory: [InventoryElement] = [
             InventoryElement(
-                id: 1,
+                productId: 1,
                 productName: "Adjustable Race",
                 productNumber: "AR-5381",
                 safetyStockLevel: 1000,
@@ -21,7 +23,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 195
             ),
             InventoryElement(
-                id: 1,
+                productId: 1,
                 productName: "Adjustable Race",
                 productNumber: "AR-5381",
                 safetyStockLevel: 1000,
@@ -33,7 +35,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 325
             ),
             InventoryElement(
-                id: 1,
+                productId: 1,
                 productName: "Adjustable Race",
                 productNumber: "AR-5381",
                 safetyStockLevel: 1000,
@@ -45,7 +47,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 355
             ),
             InventoryElement(
-                id: 2,
+                productId: 2,
                 productName: "Bearing Ball",
                 productNumber: "BA-8327",
                 safetyStockLevel: 1000,
@@ -57,7 +59,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 427
             ),
             InventoryElement(
-                id: 2,
+                productId: 2,
                 productName: "Bearing Ball",
                 productNumber: "BA-8327",
                 safetyStockLevel: 1000,
@@ -69,7 +71,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 315
             ),
             InventoryElement(
-                id: 2,
+                productId: 2,
                 productName: "Bearing Ball",
                 productNumber: "BA-8327",
                 safetyStockLevel: 1000,
@@ -81,7 +83,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 364
             ),
             InventoryElement(
-                id: 3,
+                productId: 3,
                 productName: "BB Ball Bearing",
                 productNumber: "BE-2349",
                 safetyStockLevel: 800,
@@ -93,7 +95,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 586
             ),
             InventoryElement(
-                id: 3,
+                productId: 3,
                 productName: "BB Ball Bearing",
                 productNumber: "BE-2349",
                 safetyStockLevel: 800,
@@ -105,7 +107,7 @@ class MockInventoryRepository: RepositoryProtocol {
                 quantity: 443
             ),
             InventoryElement(
-                id: 3,
+                productId: 3,
                 productName: "BB Ball Bearing",
                 productNumber: "BE-2349",
                 safetyStockLevel: 800,
@@ -124,8 +126,12 @@ class MockInventoryRepository: RepositoryProtocol {
         return inventory
     }
     
-    func getbyId(_ id: Int) async throws -> InventoryElement? {
-        inventory.first(where: { $0.id == id })
+    func getbyId(_ id: String) async throws -> InventoryElement? {
+        
+        let dashIndex = id.firstIndex(of: "-")!
+        let section = id[...dashIndex].trimmingCharacters(in: .whitespaces)
+        
+        return inventory.first(where: { $0.id == section })
     }
     
     func insert(_ item: InventoryElement) async throws -> InventoryElement {
