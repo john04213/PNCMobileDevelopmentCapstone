@@ -12,12 +12,13 @@ import SwiftUI
 // to your project, not the public interface
 internal import Combine
 
-class AuthStatus: ObservableObject {
-    
+class AuthStatus: ObservableObject, SessionStoring {
+  
     private let authKey = "userAccessToken"
     private let refreshKey = "userRefreshToken"
     
     @Published private(set) var isLoggedIn = false
+    @Published private(set) var signOutReason: String? = nil
     
     init() {
         let auth = SecureTokenManager.shared.getToken(key: authKey)
@@ -55,6 +56,16 @@ class AuthStatus: ObservableObject {
             storage.deleteToken(key: refreshKey)
         }
         
+    }
+    
+    func saveSession(accessToken: String, refreshToken: String) {
+        updateLoginStatus(success: true, authToken: accessToken, refreshToken: refreshToken)
+        signOutReason = nil
+    }
+    
+    func clearSession(reason: String?) {
+        updateLoginStatus(success: false)
+        signOutReason = reason
     }
     
 }
