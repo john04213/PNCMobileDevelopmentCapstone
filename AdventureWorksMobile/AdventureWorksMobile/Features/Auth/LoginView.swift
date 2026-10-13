@@ -20,8 +20,11 @@ struct LoginView: View {
         
         VStack {
             
-            Text("Login")
-                .font(Font.largeTitle.bold())
+            Text("Login").font(Font.largeTitle.bold())
+            if let reason = authStatus.signOutReason{
+                Text(reason)
+                    .foregroundColor(.secondary)
+            }
             
             TextField("Username", text: $viewModel.credentials.username)
             SecureField("Password", text: $viewModel.credentials.password)
@@ -32,14 +35,10 @@ struct LoginView: View {
             
             Button("Log in") {
                 Task {
-                    let response = await viewModel.login()
-                    if let resp = response {
-                        authStatus.updateLoginStatus(success: resp.success,
-                                                     authToken: resp.accessToken,
-                                                     refreshToken: resp.refreshToken)
+                    await viewModel.login(session: authStatus)
                     }
                 }
-            }
+            
             .buttonStyle(.borderedProminent)
             .disabled(viewModel.loginDisabled)
             
@@ -68,33 +67,47 @@ extension LoginView {
         var isBusy = false
         
         var loginDisabled: Bool {
-            credentials.username.isEmpty || credentials.password.isEmpty
+            credentials.username.isEmpty || credentials.password.isEmpty || isBusy
         }
         
         var errorMessage: String = ""
         
-        func login() async -> LoginResponse? {
+        private let authService: any AuthServiceProtocol
+        
+        init(
+            authService: any AuthServiceProtocol =  AuthService.shared
+        ) {
+            self.authService = authService
+        }
+        
+        
+        func login(session: any SessionStoring) async {
+            guard !isBusy else { return }
+            
             isBusy = true
+            defer { isBusy = false }
+            errorMessage = ""
             
             do {
-                let result = try await AuthService.shared.login(credentials: credentials)
-                isBusy = false
-                if !result.success {
-                    errorMessage = "Invalid username/password combination"
+                let response = try await authService.login(credentials: credentials)
+                
+                if response.success,
+                    let access = response.accessToken,
+                    let refresh = response.refreshToken {
+                        session.saveSession(accessToken: access, refreshToken: refresh)
+                    }
+                 else {
+                    errorMessage = UserFacingMessage.invalidCredentials
+                    credentials.password = ""
                 }
-                return result
+            } catch {
+                errorMessage = UserFacingMessage.from(error)
             }
-            catch {
-                errorMessage = "\(error)"
-            }
-            
-            isBusy = false
-            return nil
-            
         }
         
     }
     
+
 }
 
 #Preview {
