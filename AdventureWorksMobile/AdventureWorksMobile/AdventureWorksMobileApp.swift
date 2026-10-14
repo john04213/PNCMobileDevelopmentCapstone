@@ -41,10 +41,10 @@ struct AdventureWorksMobileApp: View {
                         }
                         .accessibilityIdentifier("inventoryViewButton")
                         Divider()
-                        Button("Log out") {
-                            authStatus.updateLoginStatus(success: false)
+                        Button("Sign out") {
+                            authStatus.clearSession(reason: nil)
                         }
-                        .accessibilityIdentifier("logOutButton")
+                        .accessibilityIdentifier("signOutButton")
                     }
                     label: {
                         Label("View", systemImage: "line.3.horizontal")
