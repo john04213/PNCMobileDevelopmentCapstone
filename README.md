@@ -75,3 +75,26 @@ Assignee: Harris Riley
 Priority: Medium
 
 
+## Running the tests
+
+**Supported versions:** Xcode 27.0, iOS 27.0 simulator
+
+### Unit Tests
+Run `AdventureWorksMobileTests` from the Test Navigator.
+Uses fakes, no need for a network connection or a login.
+
+### Sign-in UI test (credentials procedure)
+`SignInUITests` signs in against the live API. Credentials are never committed. They are set locally:
+
+1. In Xcode: **Product -> Scheme -> Edit Scheme -> Run -> Arguments**
+2. Under **Environment Variables**, add:
+   - `AW_TEST_USERNAME`
+   - `AW_TEST_PASSWORD`
+3. Get the username and password from the requirements PDF:
+   - https://github.com/Pnc-Mobile-Bootcamp/labs/tree/main/Capstone
+   - open `iOSCapstoneRequirements.pdf`
+   - page 9, **Appendix - Logins**
+4. Make sure **Shared** (bottom of the window) is **unchecked**. So that credentials isn't added to the repo
+6. Run `testSignIn` from the diamond in the gutter, on an iOS 27.0 simulator.
+
+
