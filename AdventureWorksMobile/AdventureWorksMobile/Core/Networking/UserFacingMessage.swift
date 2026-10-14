@@ -22,7 +22,7 @@ enum UserFacingMessage{
         case NetworkError.decodingFailed:
             return "Something went wrong reading the data. Please try again later."
         default:
-            return "Something went wrong. Please try again"
+            return "Something went wrong. Please try again."
             
         }
     }
