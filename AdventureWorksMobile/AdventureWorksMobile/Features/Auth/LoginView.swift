@@ -27,7 +27,9 @@ struct LoginView: View {
             }
             
             TextField("Username", text: $viewModel.credentials.username)
+                .accessibilityIdentifier("usernamefield")
             SecureField("Password", text: $viewModel.credentials.password)
+                .accessibilityIdentifier("passwordfield")
             
             if viewModel.isBusy {
                 ProgressView()
@@ -41,6 +43,7 @@ struct LoginView: View {
             
             .buttonStyle(.borderedProminent)
             .disabled(viewModel.loginDisabled)
+            .accessibilityIdentifier("loginButton")
             
             if !viewModel.errorMessage.isEmpty {
                 Text(viewModel.errorMessage)
@@ -111,5 +114,5 @@ extension LoginView {
 }
 
 #Preview {
-    LoginView()
+    LoginView().environmentObject(AuthStatus())
 }
