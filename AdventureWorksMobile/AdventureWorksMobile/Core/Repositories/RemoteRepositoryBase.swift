@@ -153,18 +153,26 @@ class RemoteRepositoryBase<Item: Codable> {
         
         guard (200...299).contains(http.statusCode) else {
             if http.statusCode == 401 {
-            
+                
                 guard !isRetry,
                       let refresh = authStatus.refreshToken,
-                        !refresh.isEmpty,
+                      !refresh.isEmpty,
                       let auth = authStatus.authToken,
-                        !auth.isEmpty else{
+                      !auth.isEmpty else{
                     authStatus.clearSession(reason: UserFacingMessage.sessionExpired)
                     throw NetworkError.unauthorized
                 }
                 
                 // try to refresh the auth token
-                let refreshResult = try await AuthService.shared.refreshToken(authToken: auth, refreshToken: refresh)
+                let refreshResult: LoginResponse
+                do{
+                    refreshResult = try await AuthService.shared.refreshToken(authToken: auth, refreshToken: refresh)
+                } catch NetworkError.unauthorized {
+                    authStatus.clearSession(reason: UserFacingMessage.sessionExpired)
+                    throw NetworkError.unauthorized
+                    } catch {
+                    throw error
+                }
                 
                 guard refreshResult.success else {
                     authStatus.clearSession(reason: UserFacingMessage.sessionExpired)
