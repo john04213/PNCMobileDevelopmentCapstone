@@ -15,50 +15,74 @@ struct LoginView: View {
     // to us. It's also specifically designed for
     // objects that maintain some state
     @EnvironmentObject var authStatus: AuthStatus
+    enum Action {case usernameField, passwordField}
+    @FocusState private var focusedField: Action?
     
     var body: some View {
         
-        VStack {
+        VStack(alignment: . leading, spacing: 12) {
             
-            Text("Login").font(Font.largeTitle.bold())
+            Text("Sign in").font(Font.largeTitle.bold())
             if let reason = authStatus.signOutReason{
                 Text(reason)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.secondary)
             }
-            
+            Text("Username")
             TextField("Username", text: $viewModel.credentials.username)
+                .textFieldStyle(.roundedBorder)
+                .textContentType(.username)
+                .focused($focusedField, equals: .usernameField)
+                .submitLabel(.next)
+                .onSubmit{focusedField = .passwordField}
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
                 .accessibilityIdentifier("usernamefield")
+            Text("Password")
             SecureField("Password", text: $viewModel.credentials.password)
+                .textFieldStyle(.roundedBorder)
+                .textContentType(.password)
+                .focused($focusedField, equals: .passwordField)
+                .submitLabel(.go)
+                .onSubmit{if !viewModel.loginDisabled {
+                    Task {
+                        await viewModel.login(session: authStatus)
+                    }
+                }}
                 .accessibilityIdentifier("passwordfield")
             
-            if viewModel.isBusy {
-                ProgressView()
-            }
             
-            Button("Log in") {
+            
+            Button {
                 Task {
                     await viewModel.login(session: authStatus)
-                    }
                 }
-            
+            } label: {
+                Group {
+                    if viewModel.isBusy {
+                    ProgressView()
+                } else {
+                    Text("Sign in")
+                }
+                }
+                .frame(maxWidth: .infinity)
+            }
             .buttonStyle(.borderedProminent)
             .disabled(viewModel.loginDisabled)
             .accessibilityIdentifier("loginButton")
-            
+
             if !viewModel.errorMessage.isEmpty {
-                Text(viewModel.errorMessage)
-                    .foregroundColor(Color.red)
+                Label(viewModel.errorMessage, systemImage:"exclamationmark.triangle")
+                    .foregroundStyle(.red)
             }
-            
+
             Spacer()
-            
+
         }
         .padding(20)
-        .autocapitalization(.none)
         .disabled(viewModel.isBusy)
-        
+
     }
-    
+
 }
 
 extension LoginView {
@@ -107,9 +131,8 @@ extension LoginView {
                 errorMessage = UserFacingMessage.from(error)
             }
         }
-        
+
     }
-    
 
 }
 
