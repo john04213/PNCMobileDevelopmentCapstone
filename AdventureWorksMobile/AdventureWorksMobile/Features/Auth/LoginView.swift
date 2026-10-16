@@ -15,48 +15,74 @@ struct LoginView: View {
     // to us. It's also specifically designed for
     // objects that maintain some state
     @EnvironmentObject var authStatus: AuthStatus
+    enum Action {case usernameField, passwordField}
+    @FocusState private var focusedField: Action?
     
     var body: some View {
         
-        VStack {
+        VStack(alignment: . leading, spacing: 12) {
             
-            Text("Login")
-                .font(Font.largeTitle.bold())
-            
-            TextField("Username", text: $viewModel.credentials.username)
-            SecureField("Password", text: $viewModel.credentials.password)
-            
-            if viewModel.isBusy {
-                ProgressView()
+            Text("Sign in").font(Font.largeTitle.bold())
+            if let reason = authStatus.signOutReason{
+                Text(reason)
+                    .foregroundStyle(.secondary)
             }
-            
-            Button("Log in") {
-                Task {
-                    let response = await viewModel.login()
-                    if let resp = response {
-                        authStatus.updateLoginStatus(success: resp.success,
-                                                     authToken: resp.accessToken,
-                                                     refreshToken: resp.refreshToken)
+            Text("Username")
+            TextField("Username", text: $viewModel.credentials.username)
+                .textFieldStyle(.roundedBorder)
+                .textContentType(.username)
+                .focused($focusedField, equals: .usernameField)
+                .submitLabel(.next)
+                .onSubmit{focusedField = .passwordField}
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .accessibilityIdentifier("usernamefield")
+            Text("Password")
+            SecureField("Password", text: $viewModel.credentials.password)
+                .textFieldStyle(.roundedBorder)
+                .textContentType(.password)
+                .focused($focusedField, equals: .passwordField)
+                .submitLabel(.go)
+                .onSubmit{if !viewModel.loginDisabled {
+                    Task {
+                        await viewModel.login(session: authStatus)
                     }
+                }}
+                .accessibilityIdentifier("passwordfield")
+            
+            
+            
+            Button {
+                Task {
+                    await viewModel.login(session: authStatus)
                 }
+            } label: {
+                Group {
+                    if viewModel.isBusy {
+                    ProgressView()
+                } else {
+                    Text("Sign in")
+                }
+                }
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
             .disabled(viewModel.loginDisabled)
-            
+            .accessibilityIdentifier("loginButton")
+
             if !viewModel.errorMessage.isEmpty {
-                Text(viewModel.errorMessage)
-                    .foregroundColor(Color.red)
+                Label(viewModel.errorMessage, systemImage:"exclamationmark.triangle")
+                    .foregroundStyle(.red)
             }
-            
+
             Spacer()
-            
+
         }
         .padding(20)
-        .autocapitalization(.none)
         .disabled(viewModel.isBusy)
-        
+
     }
-    
+
 }
 
 extension LoginView {
@@ -68,35 +94,48 @@ extension LoginView {
         var isBusy = false
         
         var loginDisabled: Bool {
-            credentials.username.isEmpty || credentials.password.isEmpty
+            credentials.username.isEmpty || credentials.password.isEmpty || isBusy
         }
         
         var errorMessage: String = ""
         
-        func login() async -> LoginResponse? {
-            isBusy = true
-            
-            do {
-                let result = try await AuthService.shared.login(credentials: credentials)
-                isBusy = false
-                if !result.success {
-                    errorMessage = "Invalid username/password combination"
-                }
-                return result
-            }
-            catch {
-                errorMessage = "\(error)"
-            }
-            
-            isBusy = false
-            return nil
-            
+        private let authService: any AuthServiceProtocol
+        
+        init(
+            authService: any AuthServiceProtocol =  AuthService.shared
+        ) {
+            self.authService = authService
         }
         
+        
+        func login(session: any SessionStoring) async {
+            guard !isBusy else { return }
+            
+            isBusy = true
+            defer { isBusy = false }
+            errorMessage = ""
+            
+            do {
+                let response = try await authService.login(credentials: credentials)
+                
+                if response.success,
+                    let access = response.accessToken,
+                    let refresh = response.refreshToken {
+                        session.saveSession(accessToken: access, refreshToken: refresh)
+                    }
+                 else {
+                    errorMessage = UserFacingMessage.invalidCredentials
+                    credentials.password = ""
+                }
+            } catch {
+                errorMessage = UserFacingMessage.from(error)
+            }
+        }
+
     }
-    
+
 }
 
 #Preview {
-    LoginView()
+    LoginView().environmentObject(AuthStatus())
 }

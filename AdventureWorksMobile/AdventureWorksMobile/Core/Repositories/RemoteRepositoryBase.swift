@@ -156,16 +156,26 @@ class RemoteRepositoryBase<Item: Codable> {
                 
                 guard !isRetry,
                       let refresh = authStatus.refreshToken,
-                        !refresh.isEmpty,
+                      !refresh.isEmpty,
                       let auth = authStatus.authToken,
-                        !auth.isEmpty else {
+                      !auth.isEmpty else{
+                    authStatus.clearSession(reason: UserFacingMessage.sessionExpired)
                     throw NetworkError.unauthorized
                 }
                 
                 // try to refresh the auth token
-                let refreshResult = try await AuthService.shared.refreshToken(authToken: auth, refreshToken: refresh)
+                let refreshResult: LoginResponse
+                do{
+                    refreshResult = try await AuthService.shared.refreshToken(authToken: auth, refreshToken: refresh)
+                } catch NetworkError.unauthorized {
+                    authStatus.clearSession(reason: UserFacingMessage.sessionExpired)
+                    throw NetworkError.unauthorized
+                    } catch {
+                    throw error
+                }
                 
                 guard refreshResult.success else {
+                    authStatus.clearSession(reason: UserFacingMessage.sessionExpired)
                     throw NetworkError.unauthorized
                 }
                 
@@ -175,8 +185,11 @@ class RemoteRepositoryBase<Item: Codable> {
                 
                 // create a copy of the original request, as it is a let constant
                 var newRequest = request
-                newRequest.setValue("Baerer \(authStatus.authToken!)", forHTTPHeaderField: "Authorization")
-                
+                guard let newToken = authStatus.authToken else {
+                    authStatus.clearSession(reason: UserFacingMessage.sessionExpired)
+                    throw NetworkError.unauthorized
+                }
+                newRequest.setValue("Bearer \(newToken)", forHTTPHeaderField: "Authorization")
                 return try await executeRequest(newRequest, isRetry: true)
                 
             }
