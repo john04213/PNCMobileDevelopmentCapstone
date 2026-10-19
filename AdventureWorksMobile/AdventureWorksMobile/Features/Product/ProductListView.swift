@@ -16,45 +16,61 @@ struct ProductListView: View {
     
     var body: some View {
         VStack {
-            if viewModel.errorMessage != "" {
-                Text(viewModel.errorMessage)
-                    .font(Font.title)
-                    .background(Color.red.opacity(0.1))
-            }
-            HStack {
-                Text("Filter")
-                TextField("Product Name", text: $viewModel.filter)
-            }
-            .padding()
-            List(viewModel.matchingProducts) { product in
-                HStack(alignment: .center) {
-                    Base64GifView(base64String: product.thumbnailPhoto)
-                        .frame(width: 100, height: 67)
+            switch viewModel.state {
+            case .loading, .idle:
+                LoadingView(message: "Loading products...")
+            case.empty:
+                EmptyStateView(message: "No products found")
+            case .failed(let errorMessage):
+                ErrorStateView(message: errorMessage, retryAction: {
+                    Task{
+                        await viewModel.loadProducts()
+                    }
+                })
+            case .loaded:
+                if !viewModel.refreshErrorMessage.isEmpty{
+                    Label(viewModel.refreshErrorMessage, systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.red)
+                }
+                HStack {
+                    Text("Filter")
+                    TextField("Product Name", text: $viewModel.filter)
+                }
+                .padding()
+                List(viewModel.matchingProducts) { product in
+                    HStack(alignment: .center) {
+                        Base64GifView(base64String: product.thumbnailPhoto)
+                            .frame(width: 100, height: 67)
+                        VStack(alignment: .leading) {
+                            Text(product.name)
+                                .lineLimit(1)
+                            Text("\(product.productNumber) · \(product.color ?? "NA")")
+                                .lineLimit(1)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .onTapGesture {
+                        self.viewModel.selectedProduct = product
+                    }
+                    
+                }
+                .refreshable{
+                    await viewModel.loadProducts()
+                }
+
+                if let selected = viewModel.selectedProduct {
                     VStack(alignment: .leading) {
-                        Text(product.name)
-                            .lineLimit(1)
-                        Text("\(product.productNumber) · \(product.color ?? "NA")")
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .onTapGesture {
-                    self.viewModel.selectedProduct = product
-                }
-            }
-            if let selected = viewModel.selectedProduct {
-                VStack(alignment: .leading) {
-                    Text(selected.name)
-                        .font(Font.title2)
-                    if let summ = selected.summary {
-                        Text(summ)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(5)
+                        Text(selected.name)
+                            .font(Font.title2)
+                        if let summ = selected.summary {
+                            Text(summ)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .padding(5)
+                        }
                     }
                 }
             }
-            
         }
         .task {
             await viewModel.loadProducts()
@@ -72,8 +88,10 @@ extension ProductListView {
         init(repository: any RepositoryProtocol<ProductElement>) {
             self.repository = repository
         }
-        
-        var errorMessage = ""
+    
+        var state = LoadState.idle
+        var refreshErrorMessage = ""
+        private var isLoading = false
         
         var products: [ProductElement] = [] {
             didSet {
@@ -103,11 +121,23 @@ extension ProductListView {
         var selectedProduct: ProductElement? = nil
         
         func loadProducts() async {
-            errorMessage = ""
+            guard !isLoading else { return }
+            isLoading = true
+            defer { isLoading = false }
+            refreshErrorMessage = ""
+            if products.isEmpty{ state = LoadState.loading }
             do {
                 products = try await repository.getAll()
+                if products.isEmpty { state = .empty} else {
+                    state = LoadState.loaded
+                }
             } catch {
-                errorMessage = "\(error)"
+                let message = UserFacingMessage.from(error)
+                if products.isEmpty {
+                    state = LoadState.failed(message: message)
+                } else {
+                    refreshErrorMessage = message
+                }
             }
         }
     }
