@@ -16,29 +16,45 @@ struct InventoryList: View {
     
     var body: some View {
         VStack {
-            if viewModel.errorMessage != "" {
-                Text(viewModel.errorMessage)
-                    .font(Font.title)
-                    .background(Color.red.opacity(0.1))
-            }
-            HStack {
-                Text("Filter")
-                TextField("Product Name or Location", text: $viewModel.filter)
-            }
-            .padding()
-            List(viewModel.matchingProducts) { product in
-                HStack (alignment: .center) {
-                    VStack(alignment: .leading) {
-                        Text(product.productName)
-                            .lineLimit(1)
-                        Text("\(product.locationName) · Shelf \(product.shelf) · Bin \(product.bin)")
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
+            switch viewModel.state {
+            case .loading, .idle :
+                LoadingView(message:"Loading inventory...")
+            case .empty:
+                EmptyStateView(message:"No inventory found")
+            case.failed(let errorMessage):
+                ErrorStateView(message: errorMessage, retryAction: {
+                    Task {
+                        await viewModel.loadProducts()
                     }
-                    Spacer()
-                    Text("\(product.quantity)")
+                })
+            case .loaded:
+                if !viewModel.refreshErrorMessage.isEmpty {
+                    Label(viewModel.refreshErrorMessage, systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.red)
+                }
+                HStack {
+                    Text("Filter")
+                    TextField("Product Name or Location", text: $viewModel.filter)
+                }
+                .padding()
+                List(viewModel.matchingProducts) { product in
+                    HStack (alignment: .center) {
+                        VStack(alignment: .leading) {
+                            Text(product.productName)
+                                .lineLimit(1)
+                            Text("\(product.locationName) · Shelf \(product.shelf) · Bin \(product.bin)")
+                                .lineLimit(1)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Text("\(product.quantity)")
+                    }
+                }
+                .refreshable{
+                    await viewModel.loadProducts()
                 }
             }
+          
         }
         .task {
             await viewModel.loadProducts()
