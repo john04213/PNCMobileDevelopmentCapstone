@@ -56,8 +56,9 @@ extension InventoryList {
         init(repository: any RepositoryProtocol<InventoryElement>) {
             self.repository = repository
         }
-        
-        var errorMessage = ""
+        var state = LoadState.idle
+        var refreshErrorMessage = ""
+        private var isLoading = false
         
         var products: [InventoryElement] = [] {
             didSet {
@@ -78,12 +79,25 @@ extension InventoryList {
         var matchingProducts: [InventoryElement] = []
         
         func loadProducts() async {
-            errorMessage = ""
+           guard !isLoading else { return }
+            isLoading = true
+            defer { isLoading = false }
+            refreshErrorMessage = ""
+            if products.isEmpty {state = LoadState.loading}
             do {
                 products = try await repository.getAll()
+                if(products.isEmpty) {state = .empty
+                } else {
+                    state = LoadState.loaded
+                }
             } catch {
-                errorMessage = "\(error)"
+                let message = UserFacingMessage.from(error)
+                if(products.isEmpty) {state = LoadState.failed(message: message)
+                } else {
+                    refreshErrorMessage = message
+                }
             }
         }
     }
 }
+
