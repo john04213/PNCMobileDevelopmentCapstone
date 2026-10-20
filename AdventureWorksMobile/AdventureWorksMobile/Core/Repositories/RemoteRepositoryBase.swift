@@ -133,6 +133,7 @@ class RemoteRepositoryBase<Item: Codable> {
         }
         
         var request = URLRequest(url: url)
+        request.timeoutInterval = NetworkingSettings.requestTimeout
         guard let auth = authStatus.authToken, !auth.isEmpty else {
             throw NetworkError.missingAuthToken
         }
