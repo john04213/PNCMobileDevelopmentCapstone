@@ -15,49 +15,64 @@ struct ProductListView: View {
     }
     
     var body: some View {
-        VStack {
-            if viewModel.errorMessage != "" {
-                Text(viewModel.errorMessage)
-                    .font(Font.title)
-                    .background(Color.red.opacity(0.1))
-            }
-            HStack {
-                Text("Filter")
-                TextField("Product Name", text: $viewModel.filter)
-            }
-            .padding()
-            List(viewModel.matchingProducts) { product in
-                HStack(alignment: .center) {
-                    Base64GifView(base64String: product.thumbnailPhoto)
-                        .frame(width: 100, height: 67)
-                    VStack(alignment: .leading) {
-                        Text(product.name)
-                            .lineLimit(1)
-                        Text("\(product.productNumber) · \(product.color ?? "NA")")
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                .onTapGesture {
-                    self.viewModel.selectedProduct = product
-                }
-            }
-            if let selected = viewModel.selectedProduct {
-                VStack(alignment: .leading) {
-                    Text(selected.name)
-                        .font(Font.title2)
-                    if let summ = selected.summary {
-                        Text(summ)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .padding(5)
-                    }
-                }
-            }
+        
+        VStack(spacing: 0) {
             
-        }
-        .task {
-            await viewModel.loadProducts()
+            // Reusable banner component that displays refresh loading state
+            LoadingStateView(state: viewModel.loadingState)
+            
+            //Reusable wrapper view that displays content based on the current loading state.
+            LoadableView(
+                state: viewModel.loadingState,
+                retry: {
+                    Task {
+                        await viewModel.loadProducts()
+                    }
+                }
+            ) {
+                VStack {
+                    HStack {
+                        Text("Filter")
+                        TextField("Product Name", text: $viewModel.filter)
+                    }
+                    .padding()
+                    List(viewModel.matchingProducts) { product in
+                        HStack(alignment: .center) {
+                            Base64GifView(base64String: product.thumbnailPhoto)
+                                .frame(width: 100, height: 67)
+                            VStack(alignment: .leading) {
+                                Text(product.name)
+                                    .lineLimit(1)
+                                Text("\(product.productNumber) · \(product.color ?? "NA")")
+                                    .lineLimit(1)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                        .onTapGesture {
+                            self.viewModel.selectedProduct = product
+                        }
+                    }
+                    .refreshable {
+                        await viewModel.loadProducts(isRefresh: true)
+                    }
+                    if let selected = viewModel.selectedProduct {
+                        VStack(alignment: .leading) {
+                            Text(selected.name)
+                                .font(Font.title2)
+                            if let summ = selected.summary {
+                                Text(summ)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .padding(5)
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            .task {
+                await viewModel.loadProducts()
+            }
         }
     }
 }
@@ -69,11 +84,11 @@ extension ProductListView {
         
         let repository: any RepositoryProtocol<ProductElement>
         
+        var loadingState: LoadingState = .loading
+        
         init(repository: any RepositoryProtocol<ProductElement>) {
             self.repository = repository
         }
-        
-        var errorMessage = ""
         
         var products: [ProductElement] = [] {
             didSet {
@@ -102,13 +117,25 @@ extension ProductListView {
         }
         var selectedProduct: ProductElement? = nil
         
-        func loadProducts() async {
-            errorMessage = ""
+        func loadProducts(isRefresh: Bool = false) async {
+            
+            loadingState = (isRefresh) ? .refreshing : .loading
+            
             do {
+                
                 products = try await repository.getAll()
+                loadingState = (products.isEmpty) ? .empty : .success
+                
             } catch {
-                errorMessage = "\(error)"
+                
+                if (isRefresh && !products.isEmpty) {
+                    loadingState = .refreshFailure("Couldn't refresh. Showing existing data.")
+                } else {
+                    loadingState = .failure(error.localizedDescription)
+                }
+                
             }
+
         }
     }
 }
