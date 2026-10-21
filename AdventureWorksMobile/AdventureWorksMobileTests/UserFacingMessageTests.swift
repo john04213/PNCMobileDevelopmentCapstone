@@ -46,4 +46,11 @@ struct UserFacingMessageTests {
         let message = UserFacingMessage.from(error)
         #expect(message == UserFacingMessage.generalError)
     }
+    
+//    @Test
+//    func noConnectionShowsOfflineMessage() {
+//        let error = NetworkError.noConnection
+//        let message = UserFacingMessage.from(error)
+//        #expect(message == UserFacingMessage.offline)
+//    }
 }
