@@ -29,6 +29,8 @@ enum UserFacingMessage{
             return signInRequired
         case NetworkError.decodingFailed:
             return badData
+            case NetworkError.noConnection:
+            return offline
         default:
             return generalError
             
