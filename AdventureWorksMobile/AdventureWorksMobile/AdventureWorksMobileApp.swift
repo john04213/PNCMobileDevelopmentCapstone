@@ -10,6 +10,7 @@ import SwiftUI
 struct AdventureWorksMobileApp: View {
     @Environment(\.productRepository) private var productRepository
     @Environment(\.inventoryRepository) private var inventoryRepository
+    @Environment(\.orderRepository) private var orderRepository
     @EnvironmentObject var authStatus: AuthStatus
     
     @State private var current: String = ""
@@ -24,6 +25,9 @@ struct AdventureWorksMobileApp: View {
                 case "inventory":
                     InventoryList(repository: inventoryRepository)
                         .accessibilityIdentifier("inventoryView")
+                case "orders":
+                    OrderListView(repository: orderRepository)
+                        .accessibilityIdentifier("ordersView")
                 default:
                     WelcomeView()
                         .accessibilityIdentifier("welcomeView")
@@ -40,6 +44,10 @@ struct AdventureWorksMobileApp: View {
                             current = "inventory"
                         }
                         .accessibilityIdentifier("inventoryViewButton")
+                        Button("Orders") {
+                            current = "orders"
+                        }
+                        .accessibilityIdentifier("ordersViewButton")
                         Divider()
                         Button("Sign out") {
                             authStatus.clearSession(reason: nil)
