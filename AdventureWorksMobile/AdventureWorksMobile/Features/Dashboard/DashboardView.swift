@@ -8,16 +8,14 @@
 import SwiftUI
 
 struct DashboardView: View {
-
-    @State private var viewModel = ViewModel()
-
+    
+    @State private var viewModel: ViewModel
+    
+    init(repository: any DashboardRepositoryProtocol) {
+        viewModel = ViewModel(repository: repository)
+    }
     var body: some View {
         VStack {
-            if viewModel.errorMessage != "" {
-                Text(viewModel.errorMessage)
-                    .foregroundStyle(.red)
-            }
-
             // Tapping funcinality needs to be added to the boxes
             
             VStack {
@@ -33,7 +31,7 @@ struct DashboardView: View {
                     }
                     .buttonStyle(.plain)
                     NavigationLink {
-                       // ad dlink to low stock
+                        // ad dlink to low stock
                     } label: {
                         DashboardBox(title: "Low Stock",
                                      systemImage: "shippingbox",
@@ -45,7 +43,7 @@ struct DashboardView: View {
                 }
                 HStack {
                     NavigationLink {
-                       // add link to strong performer
+                        // add link to strong performer
                     } label: {
                         DashboardBox(title: "Strong Performer",
                                      systemImage: "chart.line.uptrend.xyaxis",
@@ -55,7 +53,7 @@ struct DashboardView: View {
                     }
                     .buttonStyle(.plain)
                     NavigationLink {
-                       // add link to weak performers
+                        // add link to weak performers
                     } label: {
                         DashboardBox(title: "Weak Performer",
                                      systemImage: "chart.line.downtrend.xyaxis",
@@ -67,7 +65,7 @@ struct DashboardView: View {
                 }
             }
             .padding()
-
+            
             // The employee shift list
             List {
                 Section(header: Text("Day shift")) {
@@ -95,54 +93,106 @@ struct DashboardView: View {
 }
 
 extension DashboardView {
-
+    
     @Observable
     class ViewModel {
-
+        let repository: any DashboardRepositoryProtocol
+        
+        init(repository: any DashboardRepositoryProtocol) {
+            self.repository = repository
+        }
+        
+        var saleState = LoadState.loading
+        var bestWorstState = LoadState.loading
+        var lowStockState = LoadState.loading
+        var shiftState = LoadState.loading
+        
         var dailySales: [DailySales] = []
         var lowStock: [ProductStock] = []
         var productSales: [ProductSales] = []
         var shiftEmployees: [ShiftEmployee] = []
-        var errorMessage = ""
-
-        var weekTotal: Double {
-            var total = 0.0
-            for day in dailySales.suffix(7) {
-                total += day.totalSales
+            
+            var weekTotal: Double {
+                var total = 0.0
+                for day in dailySales.suffix(7) {
+                    total += day.totalSales
+                }
+                return total
             }
-            return total
-        }
-
-        func employees(on shift: String) -> [ShiftEmployee] {
-            return shiftEmployees.filter { employee in
-                employee.shift == shift
-            }
-        }
-
-        func loadData() async {
-            do {
-                dailySales = try await getList("weekly-sales")
-                lowStock = try await getList("low-stock")
-                productSales = try await getList("best-worst")
-                shiftEmployees = try await getList("shifts")
-            }
-            catch {
-                errorMessage = "Could not load the dashboard."
-            }
-        }
-
-        // Downloads one list from the API and turns the JSON into an array.
-        func getList<T: Decodable>(_ endpoint: String) async throws -> [T] {
-            let url = URL(string: "https://api.bootcampcentral.com/api/Dashboard/\(endpoint)")!
-            let (data, _) = try await URLSession.shared.data(from: url)
-            return try JSONDecoder().decode([T].self, from: data)
-        }
-    }
+                
+                func employees(on shift: String) -> [ShiftEmployee] {
+                    return shiftEmployees.filter { employee in
+                        employee.shift == shift
+                    }
+                }
+                
+                func loadData() async {
+                    async let sales: Void = loadSales()
+                    async let bestWorst: Void = loadBestWorst()
+                    async let low: Void = loadLowStock()
+                    async let shifts: Void = loadShifts()
+                    _ = await (sales, bestWorst, low, shifts)
+                    
+                }
+                
+                func loadSales() async {
+                    saleState = LoadState.loading
+                    do {
+                        dailySales = try await repository.weeklySales()
+                        if dailySales.isEmpty {
+                            saleState = LoadState.empty
+                        } else {
+                            saleState = LoadState.loaded
+                        }
+                    } catch {
+                        saleState = LoadState.failed(message: UserFacingMessage.from(error))
+                    }
+                }
+                
+                func loadBestWorst() async {
+                    bestWorstState = LoadState.loading
+                    do {
+                        productSales = try await repository.bestWorst()
+                        if productSales.isEmpty {
+                            bestWorstState = LoadState.empty
+                        } else {
+                            bestWorstState = LoadState.loaded
+                        }
+                    } catch {
+                        bestWorstState = LoadState.failed(message: UserFacingMessage.from(error))
+                    }
+                }
+                
+                func loadLowStock() async {
+                    lowStockState = LoadState.loading
+                    do {
+                        lowStock = try await repository.lowStock()
+                            lowStockState = LoadState.loaded
+                    } catch {
+                        lowStockState = LoadState.failed(message: UserFacingMessage.from(error))
+                    }
+                }
+                
+                func loadShifts() async {
+                    shiftState = LoadState.loading
+                    do {
+                        shiftEmployees = try await repository.shifts()
+                        if shiftEmployees.isEmpty {
+                            shiftState = LoadState.empty
+                        } else {
+                            shiftState = LoadState.loaded
+                        }
+                    } catch {
+                        shiftState = LoadState.failed(message: UserFacingMessage.from(error))
+                    }
+                }
+                
+                }
 }
 
 #Preview {
     NavigationStack {
-        DashboardView()
+        DashboardView(repository: RemoteDashboardRepository(urlBase: "https://api.bootcampcentral.com/api", authStatus: AuthStatus()))
     }
 }
 
