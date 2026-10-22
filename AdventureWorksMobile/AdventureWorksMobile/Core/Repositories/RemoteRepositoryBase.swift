@@ -29,6 +29,7 @@ class RemoteRepositoryBase<Item: Codable> {
         // this will also ignore parameters in the API that we aren't using
         do {
             let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
             // fee_fi_fo_fum converts to: feeFiFoFum
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             return try decoder.decode([Item].self, from: data)
