@@ -7,7 +7,7 @@
 
 
 // Mark - Weekly sales 
-class dailySales: Identifiable, Hashable, Codable {
+class DailySales: Identifiable, Hashable, Codable {
     let salesDate: String
     let totalSales: Double
     let totalProfit: Double
