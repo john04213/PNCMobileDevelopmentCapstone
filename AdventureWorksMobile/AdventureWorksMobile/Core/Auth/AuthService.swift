@@ -25,6 +25,7 @@ class AuthService: AuthServiceProtocol {
         }
         
         var request = URLRequest(url: url)
+        request.timeoutInterval = NetworkingSettings.requestTimeout
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
@@ -71,6 +72,7 @@ class AuthService: AuthServiceProtocol {
         }
         
         var request = URLRequest(url: url)
+        request.timeoutInterval = NetworkingSettings.requestTimeout
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("Bearer \(authToken)", forHTTPHeaderField: "Authorization")
