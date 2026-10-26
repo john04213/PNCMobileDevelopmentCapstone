@@ -23,4 +23,11 @@ extension EnvironmentValues {
         
     }
     
+    var orderRepository: any RepositoryProtocol<OrderElement> {
+        
+        get { self[OrderRepositoryKey.self] }
+        set { self[OrderRepositoryKey.self] = newValue }
+        
+    }
+    
 }

@@ -22,6 +22,7 @@ struct RootView: App {
 //                    .environment(\.managedObjectContext, persistenceController.container.viewContext)
                     .environment(\.productRepository, RemoteProductRepository(urlBase: awAPIURL, authStatus: authStatus))
                     .environment(\.inventoryRepository, RemoteInventoryRepository(urlBase: awAPIURL, authStatus: authStatus))
+                    .environment(\.orderRepository, RemoteOrderRepository(urlBase: awAPIURL, authStatus: authStatus))
                     .environmentObject(authStatus)
             }
             else {
