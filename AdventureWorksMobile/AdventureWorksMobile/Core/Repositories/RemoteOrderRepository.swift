@@ -25,7 +25,7 @@ class RemoteOrderRepository: RemoteRepositoryBase<OrderElement>, RepositoryProto
     
     func getbyId(_ id: Int) async throws -> OrderElement? {
         
-        let urlString = "\(urlBase)/Order/store\(id)"
+        let urlString = "\(urlBase)/Order/store/\(id)"
         return try await fetchOne(urlString)
         
     }
@@ -39,14 +39,14 @@ class RemoteOrderRepository: RemoteRepositoryBase<OrderElement>, RepositoryProto
     
     func update(_ item: OrderElement) async throws {
         
-        let urlString = "\(urlBase)/Order/store\(item.id)"
+        let urlString = "\(urlBase)/Order/store/\(item.id)"
         try await put(urlString, send: item)
         
     }
     
     func delete(_ item: OrderElement) async throws {
         
-        let urlString = "\(urlBase)/Order/store\(item.id)"
+        let urlString = "\(urlBase)/Order/store/\(item.id)"
         try await del(urlString)
         
     }
