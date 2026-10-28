@@ -1,12 +1,12 @@
 //
-//  ActiveFiltersBars.swift
+//  ActiveFiltersBar.swift
 //  AdventureWorksMobile
 //
 //  Created by John Hernandez on 10/27/26.
 //
 
 import SwiftUI
-struct ActiveFiltersBars: View {
+struct ActiveFiltersBar: View {
     let labels:  [String]
     let clearAll: () -> Void
     
@@ -20,9 +20,25 @@ struct ActiveFiltersBars: View {
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 10)
                                 .background(.thinMaterial, in: Capsule() )
+                        }
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Active filters: \(labels.joined(separator: ", "))")
                 }
+                Button {
+                        clearAll()
+                }
+                label: {
+                    Text("Clear all")
+                        .frame(minHeight: 44)
+                }
+                .accessibilityIdentifier("clearFiltersButton")
             }
+            .padding(.horizontal, 10)
         }
     }
+}
+
+#Preview {
+    ActiveFiltersBar(labels: ["Search: \"race\"", "Category: \"T-Shirts\""], clearAll: {})
 }
