@@ -16,6 +16,14 @@ struct InventoryList: View {
     
     var body: some View {
         VStack {
+            
+            LoadingBannerView(
+                state: viewModel.state,
+                isLoading: viewModel.isLoading,
+                refreshErrorMessage: viewModel.refreshErrorMessage,
+                itemName: "inventory"
+            )
+            
             switch viewModel.state {
             case .loading, .idle :
                 LoadingView(message:"Loading inventory...")
@@ -28,10 +36,6 @@ struct InventoryList: View {
                     }
                 })
             case .loaded:
-                if !viewModel.refreshErrorMessage.isEmpty {
-                    Label(viewModel.refreshErrorMessage, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
-                }
                 HStack {
                     Text("Filter")
                     TextField("Product Name or Location", text: $viewModel.filter)
@@ -74,7 +78,7 @@ extension InventoryList {
         }
         var state = LoadState.idle
         var refreshErrorMessage = ""
-        private var isLoading = false
+        private(set) var isLoading = false
         
         var products: [InventoryElement] = [] {
             didSet {

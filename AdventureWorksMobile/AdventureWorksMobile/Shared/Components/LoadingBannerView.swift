@@ -2,28 +2,32 @@
 //  SyncStatusView.swift
 //  AdventureWorksMobile
 //
-//  Created by user304506 on 10/14/26.
+//  Created by Daniela C. on 10/14/26.
 //
 
 import SwiftUI
 
-struct LoadingStateView: View {
+struct LoadingBannerView: View {
     
-    let state: LoadingState
+    let state: LoadState
+    let isLoading: Bool
+    let refreshErrorMessage: String
+    let itemName: String
     
     var body: some View {
         switch state {
-        case .loading, .empty, .failure:
+            
+        case .idle, .loading, .empty, .failed:
             EmptyView()
             
-        case .success:
-            banner("Inventory loaded · Pull down to refresh")
-            
-        case .refreshing:
-            banner("Refreshing...")
-            
-        case .refreshFailure(let message):
-            banner(message)
+        case .loaded:
+            if !refreshErrorMessage.isEmpty {
+                banner("Couldn't refresh \(itemName). Showing existing data.")
+            } else if isLoading {
+                banner("Refreshing \(itemName)...")
+            } else {
+                banner("\(itemName.capitalized) loaded · Pull down to refresh")
+            }
         }
     }
     
@@ -40,4 +44,13 @@ struct LoadingStateView: View {
             
         }
     
+}
+
+#Preview{
+    LoadingBannerView(
+        state: LoadState.loading,
+        isLoading: false,
+        refreshErrorMessage: "",
+        itemName: "Products"
+    )
 }
