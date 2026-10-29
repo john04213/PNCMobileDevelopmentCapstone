@@ -1,5 +1,5 @@
 //
-//  SyncStatusView.swift
+//  LoadingBannerView.swift
 //  AdventureWorksMobile
 //
 //  Created by Daniela C. on 10/14/26.
