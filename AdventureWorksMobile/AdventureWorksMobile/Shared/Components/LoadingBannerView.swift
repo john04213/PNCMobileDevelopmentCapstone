@@ -8,21 +8,28 @@
 import SwiftUI
 
 struct LoadingBannerView: View {
-    
+
     let state: LoadState
     let isLoading: Bool
     let refreshErrorMessage: String
     let itemName: String
-    
+
     var body: some View {
         switch state {
-            
+
         case .idle, .loading, .empty, .failed:
             EmptyView()
-            
+
         case .loaded:
             if !refreshErrorMessage.isEmpty {
-                banner("Couldn't refresh \(itemName). Showing existing data.")
+                VStack {
+                    HStack {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                        banner("Couldn't refresh \(itemName).")
+                    }
+                    banner(refreshErrorMessage)
+                }
             } else if isLoading {
                 banner("Refreshing \(itemName)...")
             } else {
@@ -30,27 +37,27 @@ struct LoadingBannerView: View {
             }
         }
     }
-    
-    private func banner(_ text: String) -> some View{
-            HStack{
-                Text(text).font(.subheadline)
-                Spacer()
-            }
-            .foregroundStyle(.secondary)
-            .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .fixedSize(horizontal: false, vertical: true)
-            .accessibilityElement(children: .combine)
-            
+
+    private func banner(_ text: String) -> some View {
+        HStack {
+            Text(text).font(.subheadline)
+            Spacer()
         }
-    
+        .foregroundStyle(.secondary)
+        .padding()
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityElement(children: .combine)
+
+    }
+
 }
 
-#Preview{
+#Preview {
     LoadingBannerView(
-        state: LoadState.loading,
+        state: .loaded,
         isLoading: false,
-        refreshErrorMessage: "",
-        itemName: "Products"
+        refreshErrorMessage: "Check your connection and try again.",
+        itemName: "products"
     )
 }
