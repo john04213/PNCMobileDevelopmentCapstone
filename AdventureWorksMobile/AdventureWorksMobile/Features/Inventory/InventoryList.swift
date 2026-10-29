@@ -17,6 +17,12 @@ struct InventoryList: View {
     var body: some View {
         VStack {
             
+            LoadingBannerView(
+                state: viewModel.state,
+                isLoading: viewModel.isLoading,
+                refreshErrorMessage: viewModel.refreshErrorMessage,
+                itemName: "inventory"
+            )
             Picker("Inventory Filter", selection: $viewModel.showLowStock) {
                 Text("All").tag(false)
                 Text("Low stock (\(viewModel.lowStockCount))").tag(true)
@@ -38,13 +44,6 @@ struct InventoryList: View {
                     }
                 )
             case .loaded:
-                if !viewModel.refreshErrorMessage.isEmpty {
-                    Label(
-                        viewModel.refreshErrorMessage,
-                        systemImage: "exclamationmark.triangle"
-                    )
-                    .foregroundStyle(.red)
-                }
                 HStack {
                     Text("Filter")
                     TextField(
@@ -105,12 +104,11 @@ extension InventoryList {
         var state = LoadState.idle
         
         var refreshErrorMessage = ""
+        private(set) var isLoading = false
         
         var showLowStock = false
         
         var totalQuantityByProductNumber: [String: Int] = [:]
-        
-        private var isLoading = false
 
         var products: [InventoryElement] = [] {
             didSet {
