@@ -16,14 +16,15 @@ struct ProductListView: View {
     
     var body: some View {
         
-        LoadingBannerView(
-            state: viewModel.state,
-            isLoading: viewModel.isLoading,
-            refreshErrorMessage: viewModel.refreshErrorMessage,
-            itemName: "products"
-        )
-        
         VStack {
+            
+            LoadingBannerView(
+                state: viewModel.state,
+                isLoading: viewModel.isLoading,
+                refreshErrorMessage: viewModel.refreshErrorMessage,
+                itemName: "products"
+            )
+            
             switch viewModel.state {
             case .loading, .idle:
                 LoadingView(message: "Loading products...")
