@@ -116,8 +116,6 @@ extension InventoryList {
         var showLowStock = false
         
         var totalQuantityByProductNumber: [String: Int] = [:]
-        
-        private var isLoading = false
 
         var products: [InventoryElement] = [] {
             didSet {
