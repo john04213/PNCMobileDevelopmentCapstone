@@ -15,3 +15,7 @@ struct InventoryRepositoryKey: EnvironmentKey {
 struct ProductRepositoryKey: EnvironmentKey {
     static let defaultValue: any RepositoryProtocol<ProductElement> = MockProductRepository()
 }
+
+struct OrderRepositoryKey: EnvironmentKey {
+    static let defaultValue: any RepositoryProtocol<OrderElement> = MockOrderRepository()
+}
