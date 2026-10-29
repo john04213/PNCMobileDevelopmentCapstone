@@ -44,13 +44,6 @@ struct InventoryList: View {
                     }
                 )
             case .loaded:
-                if !viewModel.refreshErrorMessage.isEmpty {
-                    Label(
-                        viewModel.refreshErrorMessage,
-                        systemImage: "exclamationmark.triangle"
-                    )
-                    .foregroundStyle(.red)
-                }
                 HStack {
                     Text("Filter")
                     TextField(
