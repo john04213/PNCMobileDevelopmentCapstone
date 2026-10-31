@@ -16,6 +16,14 @@ struct OrderListView: View {
     
     var body: some View {
         VStack {
+            
+            LoadingBannerView(
+                state: viewModel.state,
+                isLoading: viewModel.isLoading,
+                refreshErrorMessage: viewModel.refreshErrorMessage,
+                itemName: "orders"
+            )
+            
             switch viewModel.state {
             case .loading, .idle: LoadingView(message: "Loading orders...")
             case .empty: EmptyStateView(message: "No orders found")
@@ -25,10 +33,6 @@ struct OrderListView: View {
                 }
             })
             case .loaded:
-                if !viewModel.refreshErrorMessage.isEmpty {
-                    Label(viewModel.refreshErrorMessage, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
-                }
                 HStack {
                     Text("Filter")
                     TextField("Order number or store", text: $viewModel.filter)
@@ -99,7 +103,7 @@ extension OrderListView {
         
         var state = LoadState.idle
         var refreshErrorMessage = ""
-        private var isLoading = false
+        private(set) var isLoading = false
         
         var orders: [Order] = [] {
             didSet {
