@@ -42,14 +42,14 @@ class RemoteInventoryRepository: RemoteRepositoryBase<InventoryElement>, Reposit
     
     func update(_ item: InventoryElement) async throws {
         
-        let urlString = "\(urlBase)/Inventory/\(item.id)"
+        let urlString = "\(urlBase)/Inventory/\(item.productId)/\(item.locationId)"
         try await put(urlString, send: item)
         
     }
     
     func delete(_ item: InventoryElement) async throws {
         
-        let urlString = "\(urlBase)/Inventory/\(item.id)"
+        let urlString = "\(urlBase)/Inventory/\(item.productId)"
         try await del(urlString)
         
     }
