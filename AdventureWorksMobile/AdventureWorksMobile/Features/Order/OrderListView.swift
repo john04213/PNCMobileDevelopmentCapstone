@@ -65,6 +65,11 @@ struct OrderListView: View {
                 .refreshable {
                     await viewModel.loadOrders()
                 }
+                .overlay{
+                    if viewModel.matchingOrders.isEmpty{
+                        EmptyStateView(message: "No orders match \"\(viewModel.filter)\". Clear the filter to see all orders.")
+                    }
+                }
                 if let selected = viewModel.selectedOrder {
                     VStack(alignment: .center) {
                         Text(selected.name)
