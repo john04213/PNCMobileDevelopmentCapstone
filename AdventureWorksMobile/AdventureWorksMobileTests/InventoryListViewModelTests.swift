@@ -102,4 +102,31 @@ struct InventoryListViewModelTests{
         
         #expect(vm.state != .loading)
     }
+    
+    @Test
+    func lowStockChipAddsLabel() {
+        let repo = FailingInventoryRepository()
+        let vm = InventoryList.ViewModel(repository: repo)
+        vm.criteria.searchText = "race"
+        vm.showLowStock = true
+        
+        let labels = vm.activeLabels
+        
+        #expect(labels == ["Search: \"race\"", "Low stock" ])
+        
+    }
+    
+    @Test
+    func clearFiltersResetsBoth() {
+        let repo = FailingInventoryRepository()
+        let vm = InventoryList.ViewModel(repository: repo)
+        vm.criteria.searchText = "race"
+        vm.showLowStock = true
+        
+        vm.clearFilters()
+        
+        #expect(vm.criteria.searchText.isEmpty)
+        #expect(!vm.showLowStock)
+        #expect(vm.activeLabels.isEmpty)
+    }
 }
