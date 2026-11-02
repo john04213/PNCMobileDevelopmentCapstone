@@ -15,7 +15,16 @@ struct ProductListView: View {
     }
     
     var body: some View {
+        
         VStack {
+            
+            LoadingBannerView(
+                state: viewModel.state,
+                isLoading: viewModel.isLoading,
+                refreshErrorMessage: viewModel.refreshErrorMessage,
+                itemName: "products"
+            )
+            
             switch viewModel.state {
             case .loading, .idle:
                 LoadingView(message: "Loading products...")
@@ -28,10 +37,6 @@ struct ProductListView: View {
                     }
                 })
             case .loaded:
-                if !viewModel.refreshErrorMessage.isEmpty{
-                    Label(viewModel.refreshErrorMessage, systemImage: "exclamationmark.triangle")
-                        .foregroundStyle(.red)
-                }
                 HStack {
                     Text("Filter")
                     TextField("Product Name", text: $viewModel.filter)
@@ -91,7 +96,7 @@ extension ProductListView {
     
         var state = LoadState.idle
         var refreshErrorMessage = ""
-        private var isLoading = false
+        private(set) var isLoading = false
         
         var products: [ProductElement] = [] {
             didSet {
