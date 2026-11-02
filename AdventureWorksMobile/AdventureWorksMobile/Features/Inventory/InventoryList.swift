@@ -125,6 +125,7 @@ struct InventoryList: View {
                                             )
                                             await viewModel.updateProduct(item: invItem)
                                             await viewModel.loadProducts()
+                                            confirmUpdate = false
                                             
                                             count = 0
                                             viewModel.selectedProduct = nil
@@ -186,7 +187,7 @@ struct InventoryList: View {
                                 Text("Change")
                                 Spacer()
                                 if selected.quantity != count {
-                                    Text("Change")
+                                    Text("Change \(count - selected.quantity)")
                                         .bold()
                                 }
                                 else {
@@ -220,7 +221,6 @@ struct InventoryList: View {
                     HStack {
                         Button("No") {
                             withAnimation {
-                                
                                 showPopup = false
                             }
                         }
