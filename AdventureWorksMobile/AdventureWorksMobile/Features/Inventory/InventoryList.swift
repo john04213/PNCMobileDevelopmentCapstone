@@ -48,10 +48,14 @@ struct InventoryList: View {
                     Text("Filter")
                     TextField(
                         "Product Name or Location",
-                        text: $viewModel.filter
+                        text: $viewModel.criteria.searchText
                     )
                 }
                 .padding()
+                ActiveFiltersBar(
+                    labels: viewModel.activeLabels,
+                     clearAll: { viewModel.clearFilters() }
+                )
                 List(viewModel.matchingProducts) { product in
                     HStack(alignment: .center) {
                         VStack(alignment: .leading) {
@@ -81,6 +85,11 @@ struct InventoryList: View {
                 }
                 .refreshable {
                     await viewModel.loadProducts()
+                    }
+                .overlay{
+                    if viewModel.matchingProducts.isEmpty{
+                        EmptyStateView(message:"No matching inventory. Tap clear all to see everything" )
+                    }
                 }
             }
 
@@ -112,33 +121,38 @@ extension InventoryList {
 
         var products: [InventoryElement] = [] {
             didSet {
-                filter = ""
+                criteria.clear()
                 generateDictionary()
                 generateLowStockList()
 
             }
         }
-        var filter: String = ""
+        var criteria = InventoryCriteria()
         
         var matchingProducts: [InventoryElement] {
-            
             let selectedProducts = showLowStock ? lowStockProducts : products
-            
-            return selectedProducts.filter { product in
-               filter == ""
-                   || product.productName.lowercased()
-                       .contains(filter.lowercased())
-                   || product.locationName.lowercased()
-                       .contains(filter.lowercased())
-           }
-            
+            return criteria.apply(to: selectedProducts)
         }
+            var activeLabels: [String] {
+                var labels = criteria.activeLabels
+                if showLowStock{
+                    labels.append("Low stock")
+                }
+                return labels
+            }
+            
+        
         
         var lowStockProducts: [InventoryElement] = []
         
         var lowStockCount: Int {
             Set(lowStockProducts.map(\.productNumber)).count
         }
+            
+            func clearFilters() {
+                criteria.clear()
+                showLowStock = false
+            }
 
         func generateDictionary() {
             
