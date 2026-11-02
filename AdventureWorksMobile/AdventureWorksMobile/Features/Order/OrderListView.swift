@@ -16,54 +16,66 @@ struct OrderListView: View {
     
     var body: some View {
         VStack {
-            if viewModel.errorMessage != "" {
-                Text(viewModel.errorMessage)
-                    .font(Font.title)
-                    .background(Color.red.opacity(0.1))
-            }
-            HStack {
-                Text("Filter")
-                TextField("Order number or store", text: $viewModel.filter)
-            }
-            .padding()
-            List(viewModel.matchingOrders) { order in
-                HStack (alignment: .center) {
-                    VStack(alignment: .leading) {
-                        Text(order.name)
-                            .bold()
-                            .lineLimit(1)
-                        Text("\(order.storeName) · \(viewModel.quantity(order: order)) item\(viewModel.plural(order: order))" )
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                    VStack (alignment: .trailing) {
-                        Text("\(String(format: "$%.2f", viewModel.totalPrice(order: order)))")
-                            .bold()
-                            .lineLimit(1)
-                        Text("[\(order.orderDate.replacingOccurrences(of: "T00:00:00", with: ""))]")
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
-                    }
+            switch viewModel.state {
+            case .loading, .idle: LoadingView(message: "Loading orders...")
+            case .empty: EmptyStateView(message: "No orders found")
+            case .failed(let errorMessage):  ErrorStateView(message: errorMessage, retryAction: {
+                Task {
+                    await viewModel.loadOrders()
                 }
-                .onTapGesture {
-                    self.viewModel.selectedOrder = order
+            })
+            case .loaded:
+                if !viewModel.refreshErrorMessage.isEmpty {
+                    Label(viewModel.refreshErrorMessage, systemImage: "exclamationmark.triangle")
+                        .foregroundStyle(.red)
                 }
-            }
-            if let selected = viewModel.selectedOrder {
-                VStack(alignment: .center) {
-                    Text(selected.name)
-                        .font(Font.title2)
-                        .bold()
-                    Text("\(selected.storeName) · \(viewModel.quantity(order: selected)) item\(viewModel.plural(order: selected))" )
-                        .lineLimit(1)
-                        .foregroundStyle(.secondary)
-                        .padding(.bottom, 20)
-                    List() {
-                        ForEach(selected.lineItems) { lineItem in
-                            UniqueBlockView(title: lineItem.productName, subTitle: "\(lineItem.orderQty) x \(String(format: "$%.2f", lineItem.unitPrice))", total: lineItem.lineTotal)
+                HStack {
+                    Text("Filter")
+                    TextField("Order number or store", text: $viewModel.filter)
+                }
+                .padding()
+                List(viewModel.matchingOrders) { order in
+                    HStack (alignment: .center) {
+                        VStack(alignment: .leading) {
+                            Text(order.name)
+                                .bold()
+                                .lineLimit(1)
+                            Text("\(order.storeName) · \(viewModel.quantity(order: order)) item\(viewModel.plural(order: order))" )
+                                .lineLimit(1)
+                                .foregroundStyle(.secondary)
                         }
-                        UniqueBlockView(title: "Order total", total: viewModel.totalPrice(order: selected))
+                        Spacer()
+                        VStack (alignment: .trailing) {
+                            Text("\(String(format: "$%.2f", viewModel.totalPrice(order: order)))")
+                                .bold()
+                                .lineLimit(1)
+                            Text("[\(order.orderDate.replacingOccurrences(of: "T00:00:00", with: ""))]")
+                                .lineLimit(1)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .onTapGesture {
+                        self.viewModel.selectedOrder = order
+                    }
+                }
+                .refreshable {
+                    await viewModel.loadOrders()
+                }
+                if let selected = viewModel.selectedOrder {
+                    VStack(alignment: .center) {
+                        Text(selected.name)
+                            .font(Font.title2)
+                            .bold()
+                        Text("\(selected.storeName) · \(viewModel.quantity(order: selected)) item\(viewModel.plural(order: selected))" )
+                            .lineLimit(1)
+                            .foregroundStyle(.secondary)
+                            .padding(.bottom, 20)
+                        List() {
+                            ForEach(selected.lineItems) { lineItem in
+                                UniqueBlockView(title: lineItem.productName, subTitle: "\(lineItem.orderQty) x \(String(format: "$%.2f", lineItem.unitPrice))", total: lineItem.lineTotal)
+                            }
+                            UniqueBlockView(title: "Order total", total: viewModel.totalPrice(order: selected))
+                        }
                     }
                 }
             }
@@ -85,7 +97,9 @@ extension OrderListView {
             self.repository = repository
         }
         
-        var errorMessage = ""
+        var state = LoadState.idle
+        var refreshErrorMessage = ""
+        private var isLoading = false
         
         var orders: [Order] = [] {
             didSet {
@@ -114,12 +128,20 @@ extension OrderListView {
         var selectedOrder: Order? = nil
         
         func loadOrders() async {
-            errorMessage = ""
+            guard !isLoading else {return}
+            isLoading = true
+            defer{isLoading = false}
+            refreshErrorMessage = ""
+            if orders.isEmpty { state = .loading}
             do {
                 let tempOrders = try await repository.getAll()
                 orders = convertAllOrders(orders: tempOrders)
+                if orders.isEmpty { state = .empty }
+                else { state = .loaded }
             } catch {
-                errorMessage = "\(error)"
+                let message = UserFacingMessage.from(error)
+                if orders.isEmpty { state = .failed(message: message)}
+                else {refreshErrorMessage = message}
             }
         }
         

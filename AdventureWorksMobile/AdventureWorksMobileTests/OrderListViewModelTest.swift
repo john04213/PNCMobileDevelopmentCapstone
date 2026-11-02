@@ -96,4 +96,39 @@ struct OrderListViewModelTest {
         // Assert
         #expect(viewModel.matchingOrders.count == 1)
     }
+    
+    @Test
+    func firstLoadFailureShowsErrorState() async {
+        // Arrange
+        let repo = FailingOrderRepository()
+        let viewModel = OrderListView.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadOrders()
+        
+        //Assert
+        #expect(viewModel.state == .failed(message: UserFacingMessage.from(repo.errorToThrow)))
+    }
+    
+    @Test
+    func refreshFailureKeepsOrdersAndShowBanner() async throws {
+        // Arrange
+        let repo = FailingOrderRepository()
+        repo.shouldFail = false
+        repo.itemsToReturn = try await MockOrderRepository().getAll()
+        let viewModel = OrderListView.ViewModel(repository: repo)
+        
+        
+        await viewModel.loadOrders()
+        repo.shouldFail = true
+        // act
+        
+        await viewModel.loadOrders()
+        
+        // Assert
+        #expect(viewModel.state == .loaded)
+        #expect(!viewModel.refreshErrorMessage.isEmpty)
+        #expect(viewModel.orders.count == 2)
+        
+    }
 }
