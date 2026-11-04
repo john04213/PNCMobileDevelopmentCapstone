@@ -62,6 +62,11 @@ struct ProductListView: View {
                 .refreshable{
                     await viewModel.loadProducts()
                 }
+                .overlay{
+                    if viewModel.matchingProducts.isEmpty{
+                        EmptyStateView(message: "No products match \"\(viewModel.filter)\". Clear the filter to see all products.")
+                    }
+                }
 
                 if let selected = viewModel.selectedProduct {
                     VStack(alignment: .leading) {
