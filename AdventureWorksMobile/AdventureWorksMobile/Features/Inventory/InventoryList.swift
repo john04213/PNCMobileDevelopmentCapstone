@@ -12,11 +12,11 @@ struct InventoryList: View {
     @State private var count: Int = 0
     @State private var showPopup = false
     @State private var confirmUpdate = false
-
+    
     init(repository: any RepositoryProtocol<InventoryElement>) {
         viewModel = ViewModel(repository: repository)
     }
-
+    
     var body: some View {
         ZStack {
             VStack {
@@ -52,10 +52,14 @@ struct InventoryList: View {
                         Text("Filter")
                         TextField(
                             "Product Name or Location",
-                            text: $viewModel.filter
+                            text: $viewModel.criteria.searchText
                         )
                     }
                     .padding()
+                    ActiveFiltersBar(
+                        labels: viewModel.activeLabels,
+                        clearAll: { viewModel.clearFilters() }
+                    )
                     List(viewModel.matchingProducts) { product in
                         HStack(alignment: .center) {
                             VStack(alignment: .leading) {
@@ -89,6 +93,11 @@ struct InventoryList: View {
                     }
                     .refreshable {
                         await viewModel.loadProducts()
+                    }
+                    .overlay{
+                        if viewModel.matchingProducts.isEmpty{
+                            EmptyStateView(message:"No matching inventory. Tap clear all to see everything" )
+                        }
                     }
                     if let selected = viewModel.selectedProduct {
                         VStack {
@@ -173,7 +182,7 @@ struct InventoryList: View {
                                         .foregroundStyle(.gray)
                                 }
                             }
-                                .padding(.horizontal)
+                            .padding(.horizontal)
                             Divider()
                             HStack {
                                 Text("Current quantity")
@@ -181,7 +190,7 @@ struct InventoryList: View {
                                 Text(String(selected.quantity))
                                     .bold()
                             }
-                                .padding(.horizontal)
+                            .padding(.horizontal)
                             Divider()
                             HStack {
                                 Text("Change")
@@ -195,7 +204,7 @@ struct InventoryList: View {
                                         .bold()
                                 }
                             }
-                                .padding(.horizontal)
+                            .padding(.horizontal)
                         }
                     }
                 }
@@ -224,42 +233,42 @@ struct InventoryList: View {
                                 showPopup = false
                             }
                         }
-                            .padding(.horizontal, 30)
-                            .padding(.vertical, 10)
-                            .background(.red)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
+                        .padding(.horizontal, 30)
+                        .padding(.vertical, 10)
+                        .background(.red)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                         Button("Yes") {
                             withAnimation {
                                 confirmUpdate = true
                                 showPopup = false
                             }
                         }
-                            .padding(.horizontal, 30)
-                            .padding(.vertical, 10)
-                            .background(.green)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
+                        .padding(.horizontal, 30)
+                        .padding(.vertical, 10)
+                        .background(.green)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                     }
                 }
-                    .padding(24)
-                    .background(.white)
-                    .cornerRadius(16)
-                    .shadow(radius: 20)
-                    .frame(width: 300)
-                    .transition(.scale.combined(with: .opacity))
+                .padding(24)
+                .background(.white)
+                .cornerRadius(16)
+                .shadow(radius: 20)
+                .frame(width: 300)
+                .transition(.scale.combined(with: .opacity))
             }
         }
     }
 }
 
 extension InventoryList {
-
+    
     @Observable
     class ViewModel {
-
+        
         let repository: any RepositoryProtocol<InventoryElement>
-
+        
         init(repository: any RepositoryProtocol<InventoryElement>) {
             self.repository = repository
         }
@@ -271,29 +280,35 @@ extension InventoryList {
         var showLowStock = false
         
         var totalQuantityByProductNumber: [String: Int] = [:]
-
+        
         var products: [InventoryElement] = [] {
             didSet {
-                filter = ""
+                criteria.clear()
                 generateDictionary()
                 generateLowStockList()
-
+                
             }
         }
-        var filter: String = ""
+        var criteria = InventoryCriteria()
+        
         
         var matchingProducts: [InventoryElement] {
             
             let selectedProducts = showLowStock ? lowStockProducts : products
             
-            return selectedProducts.filter { product in
-               filter == ""
-                   || product.productName.lowercased()
-                       .contains(filter.lowercased())
-                   || product.locationName.lowercased()
-                       .contains(filter.lowercased())
-           }
+            return criteria.apply(to: selectedProducts)
             
+        }
+        var activeLabels: [String] {
+            var labels = criteria.activeLabels
+            if showLowStock{
+                labels.append("Low stock")
+            }
+            return labels
+        }
+        func clearFilters() {
+            criteria.clear()
+            showLowStock = false
         }
         var selectedProduct: InventoryElement? = nil
         
@@ -302,7 +317,7 @@ extension InventoryList {
         var lowStockCount: Int {
             Set(lowStockProducts.map(\.productNumber)).count
         }
-
+        
         func generateDictionary() {
             
             totalQuantityByProductNumber = [:]
@@ -310,10 +325,10 @@ extension InventoryList {
             products.forEach { product in
                 if let quantity = totalQuantityByProductNumber[product.productNumber] {
                     totalQuantityByProductNumber[product.productNumber] =
-                        quantity + product.quantity
+                    quantity + product.quantity
                 } else {
                     totalQuantityByProductNumber[product.productNumber] =
-                        product.quantity
+                    product.quantity
                 }
             }
         }
@@ -323,14 +338,14 @@ extension InventoryList {
                 isLowStock(product: product)
             }
         }
-
+        
         func isLowStock(product: InventoryElement) -> Bool {
             guard let totalQuantity = totalQuantityByProductNumber[product.productNumber] else {
                 return false
             }
             return totalQuantity <= product.safetyStockLevel
         }
-
+        
         func loadProducts() async {
             guard !isLoading else { return }
             isLoading = true
