@@ -72,9 +72,21 @@ struct OrderListView: View {
                 }
                 if let selected = viewModel.selectedOrder {
                     VStack(alignment: .center) {
-                        Text(selected.name)
-                            .font(Font.title2)
-                            .bold()
+                        ZStack (alignment: .trailing) {
+                            HStack {
+                                Spacer()
+                                Text(selected.name)
+                                    .font(Font.title2)
+                                    .bold()
+                                Spacer()
+                            }
+                            Button {
+                                viewModel.selectedOrder = nil
+                            } label : {
+                                Image(systemName: "xmark")
+                                    .frame(minWidth: 44, minHeight: 44)
+                            }
+                        }
                         Text("\(selected.storeName) · \(viewModel.quantity(order: selected)) item\(viewModel.plural(order: selected))" )
                             .lineLimit(1)
                             .foregroundStyle(.secondary)
