@@ -72,7 +72,7 @@ struct ProductListView: View {
                         }
                     }
                     .onTapGesture {
-                        self.viewModel.selectedProduct = product
+                        self.viewModel.toggleSelection(of: product)
                     }
 
                 }
@@ -90,8 +90,19 @@ struct ProductListView: View {
 
                 if let selected = viewModel.selectedProduct {
                     VStack(alignment: .leading) {
-                        Text(selected.name)
-                            .font(Font.title2)
+                        HStack{
+                            Text(selected.name)
+                                .font(Font.title2)
+                            Spacer()
+                            Button {
+                                viewModel.selectedProduct = nil
+                            } label : {
+                                Image(systemName: "xmark")
+                                    .frame(minWidth: 44, minHeight: 44)
+                            }
+                            .accessibilityLabel("Close")
+                            .accessibilityIdentifier("closeSelectedProductButton")
+                        }
                         if let summ = selected.summary {
                             Text(summ)
                                 .font(.caption)
@@ -142,6 +153,14 @@ extension ProductListView {
             criteria.apply(to: products)
         }
         var selectedProduct: ProductElement? = nil
+        func toggleSelection(of product: ProductElement) {
+            if selectedProduct == product {
+                selectedProduct = nil
+            } else {
+                selectedProduct = product
+            }
+        }
+       
 
         func loadProducts() async {
             guard !isLoading else { return }
