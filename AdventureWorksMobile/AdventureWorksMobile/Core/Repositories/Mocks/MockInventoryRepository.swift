@@ -139,7 +139,10 @@ class MockInventoryRepository: RepositoryProtocol {
     }
     
     func update(_ item: InventoryElement) async throws {
-        throw FeatureError.notImplemented
+        if let index = inventory.firstIndex(where: { $0.id == item.id }) {
+            inventory[index] = item
+        }
+
     }
     
     func delete(_ item: InventoryElement) async throws {

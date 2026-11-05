@@ -33,6 +33,61 @@ struct AdventureWorksMobileApp: View {
                         .accessibilityIdentifier("welcomeView")
                 }
             }
+//            .toolbar {
+//                ToolbarItemGroup(placement: .bottomBar) {
+//                    Button(action: {
+//                        print("Home tapped")
+//                    }) {
+//                        HStack {
+//                            Image(systemName: "house")
+//                            Text("Home")
+//                        }
+//                    }
+//                    Spacer()
+//
+//                    Button(action: {
+//                        print("Employees tapped")
+//                    }) {
+//                        HStack{
+//                            Image(systemName: "person.2")
+//                            Text("Employees")
+//                        }
+//                    }
+//                    Spacer()
+//                    
+//                    Button(action: {
+//                        print("Products tapped")
+//                        current = "products"
+//                    }) {
+//                        HStack {
+//                            Image(systemName: "tag")
+//                            Text("Products")
+//                        }
+//                    }
+//                    Spacer()
+//                    
+//                    Button(action: {
+//                        print("Inventory tapped")
+//                        current = "inventory"
+//                    }) {
+//                        HStack {
+//                            Image(systemName: "shippingbox")
+//                            Text("Inventory")
+//                        }
+//                    }
+//                    Spacer()
+//                    
+//                    Button(action: {
+//                        print("Orders tapped")
+//                        current = "orders"
+//                    }) {
+//                        HStack {
+//                            Image(systemName: "receipt")
+//                            Text("Orders")
+//                        }
+//                    }
+//                }
+//            }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
