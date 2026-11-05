@@ -71,4 +71,54 @@ struct ProductListViewModelTests{
         #expect(vm.selectedProduct == nil)
         
     }
+    
+    @Test func loadDataPopulatesProductsFromRepository() async {
+        // Arrange
+        let repo = MockProductRepository()
+        let viewModel = ProductListView.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        
+        // Assert
+        #expect(viewModel.products.count == 5)
+    }
+    
+    @Test func withBlankFilterMatchingProductsHaveAllProducts() async {
+        // Arrange
+        let repo = MockProductRepository()
+        let viewModel = ProductListView.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        
+        // Assert
+        #expect(viewModel.matchingProducts.count == 5)
+    }
+    
+    @Test func withNameFilterMatchingProductsDoesNotHaveAllProducts() async {
+        // Arrange
+        let repo = MockProductRepository()
+        let viewModel = ProductListView.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        viewModel.criteria.searchText = "Sport-100 Helmet"
+        
+        // Assert
+        #expect(viewModel.matchingProducts.count == 2)
+    }
+    
+    @Test func withProductNumberFilterMatchingProductsDoesNotHaveAllProducts() async {
+        // Arrange
+        let repo = MockProductRepository()
+        let viewModel = ProductListView.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        viewModel.criteria.searchText = "Pr5604-EV454-78"
+        
+        // Assert
+        #expect(viewModel.matchingProducts.count == 1)
+    }
 }
