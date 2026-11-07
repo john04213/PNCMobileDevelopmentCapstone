@@ -129,4 +129,84 @@ struct InventoryListViewModelTests{
         #expect(!vm.showLowStock)
         #expect(vm.activeLabels.isEmpty)
     }
+    
+    @Test func loadDataPopulatesInventoryItemsFromRepository() async {
+        // Arrange
+        let repo = MockInventoryRepository()
+        let viewModel = InventoryList.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        
+        // Assert
+        #expect(viewModel.products.count == 9)
+    }
+    
+    @Test func whenUpdatingAProductsQuantityTotalQuantityIncreases() async {
+        // Arrange
+        let repo = MockInventoryRepository()
+        let viewModel = InventoryList.ViewModel(repository: repo)
+        let product = InventoryElement(
+            productId: 3,
+            productName: "BB Ball Bearing",
+            productNumber: "BE-2349",
+            safetyStockLevel: 800,
+            reorderPoint: 600,
+            locationId: 50,
+            locationName: "Subassembly",
+            shelf: "A",
+            bin: 10,
+            quantity: 999       // updated qty
+        )
+        
+        // Act
+        await viewModel.loadProducts()
+        await viewModel.updateProduct(item: product)
+        await viewModel.loadProducts()
+        var sum = 0
+        viewModel.products.forEach { product in
+            sum += product.quantity
+        }
+        
+        // Assert
+        #expect(sum > 3_334)
+    }
+    
+    @Test func withBlankFilterMatchingProductsHasAllOrders() async {
+        // Arrange
+        let repo = MockInventoryRepository()
+        let viewModel = InventoryList.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        
+        // Assert
+        #expect(viewModel.matchingProducts.count == 9)
+    }
+    
+    @Test func filteringProductsNameShowsTheCorrectNumberOfProducts() async {
+        // Arrange
+        let repo = MockInventoryRepository()
+        let viewModel = InventoryList.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        viewModel.criteria.searchText = "BB Ball Bearing"
+        
+        // Assert
+        #expect(viewModel.matchingProducts.count == 3)
+    }
+    
+    @Test func filteringProductsLocationShowsTheCorrectNumberOfProducts() async {
+        // Arrange
+        let repo = MockInventoryRepository()
+        let viewModel = InventoryList.ViewModel(repository: repo)
+        
+        // Act
+        await viewModel.loadProducts()
+        viewModel.criteria.searchText = "Subassembly"
+        
+        // Assert
+        #expect(viewModel.matchingProducts.count == 3)
+    }
 }
