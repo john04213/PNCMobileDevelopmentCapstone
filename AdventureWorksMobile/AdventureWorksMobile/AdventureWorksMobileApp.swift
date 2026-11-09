@@ -11,14 +11,19 @@ struct AdventureWorksMobileApp: View {
     @Environment(\.productRepository) private var productRepository
     @Environment(\.inventoryRepository) private var inventoryRepository
     @Environment(\.orderRepository) private var orderRepository
+    @Environment(\.employeeRepository) private var employeeRepository
+    @Environment(\.dashboardRepository) private var dashboardRepository
     @EnvironmentObject var authStatus: AuthStatus
     
-    @State private var current: String = ""
+    @State private var current: String = "dashboard"
     
     var body: some View {
         NavigationStack {
             VStack {
                 switch current {
+                case "dashboard":
+                    DashboardView(repository: dashboardRepository)
+                        .accessibilityIdentifier("dashboardView")
                 case "products":
                     ProductListView(repository: productRepository)
                         .accessibilityIdentifier("productView")
@@ -28,6 +33,9 @@ struct AdventureWorksMobileApp: View {
                 case "orders":
                     OrderListView(repository: orderRepository)
                         .accessibilityIdentifier("ordersView")
+                case "employees":
+                    EmployeeListView(repository: employeeRepository)
+                        .accessibilityIdentifier("employeesView")
                 default:
                     WelcomeView()
                         .accessibilityIdentifier("welcomeView")
@@ -91,6 +99,10 @@ struct AdventureWorksMobileApp: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Menu {
+                        Button("Dashboard") {
+                            current = "dashboard"
+                        }
+                        .accessibilityIdentifier("dashboardViewButton")
                         Button("Products") {
                             current = "products"
                         }
@@ -103,6 +115,10 @@ struct AdventureWorksMobileApp: View {
                             current = "orders"
                         }
                         .accessibilityIdentifier("ordersViewButton")
+                        Button("Employees") {
+                            current = "employees"
+                        }
+                        .accessibilityIdentifier("employeesViewButton")
                         Divider()
                         Button("Sign out") {
                             authStatus.clearSession(reason: nil)

@@ -23,6 +23,8 @@ struct RootView: App {
                     .environment(\.productRepository, RemoteProductRepository(urlBase: awAPIURL, authStatus: authStatus))
                     .environment(\.inventoryRepository, RemoteInventoryRepository(urlBase: awAPIURL, authStatus: authStatus))
                     .environment(\.orderRepository, RemoteOrderRepository(urlBase: awAPIURL, authStatus: authStatus))
+                    .environment(\.employeeRepository, RemoteEmployeeRepository(urlBase: awAPIURL, authStatus: authStatus))
+                    .environment(\.dashboardRepository, RemoteDashboardRepository(urlBase: awAPIURL, authStatus: authStatus))
                     .environmentObject(authStatus)
             }
             else {
