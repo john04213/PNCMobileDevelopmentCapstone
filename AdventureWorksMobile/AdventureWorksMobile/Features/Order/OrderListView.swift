@@ -38,6 +38,10 @@ struct OrderListView: View {
                     TextField("Order number or store", text: $viewModel.filter)
                 }
                 .padding()
+                ActiveFiltersBar(
+                    labels: viewModel.activeLabels,
+                    clearAll: { viewModel.clearFilters() }
+                )
                 List(viewModel.matchingOrders) { order in
                     HStack (alignment: .center) {
                         VStack(alignment: .leading) {
@@ -67,7 +71,7 @@ struct OrderListView: View {
                 }
                 .overlay{
                     if viewModel.matchingOrders.isEmpty{
-                        EmptyStateView(message: "No orders match \"\(viewModel.filter)\". Clear the filter to see all orders.")
+                        EmptyStateView(message: "No orders match \"\(viewModel.filter)\".Tap Clear all to see all orders.")
                     }
                 }
                 if let selected = viewModel.selectedOrder {
@@ -147,6 +151,16 @@ extension OrderListView {
                     selectedOrder = nil
                 }
             }
+        }
+        
+        var activeLabels: [String]{
+            var labels: [String] = []
+            if !filter.isEmpty { labels.append("Search: \"\(filter)\"")}
+            return labels
+        }
+        
+        func clearFilters() {
+            filter = ""
         }
         var selectedOrder: Order? = nil
         

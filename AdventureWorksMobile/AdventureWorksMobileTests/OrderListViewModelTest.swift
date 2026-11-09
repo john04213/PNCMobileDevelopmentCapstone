@@ -144,4 +144,29 @@ struct OrderListViewModelTest {
         viewModel.toggleSelection(of: order)
         #expect(viewModel.selectedOrder == nil)
     }
+    
+    @Test
+    func searchShowsAChip()  {
+        let repo = MockOrderRepository()
+        let viewModel = OrderListView.ViewModel(repository: repo)
+        
+        viewModel.filter = "Good Toys"
+        let labels = viewModel.activeLabels
+        
+        #expect(labels == ["Search: \"Good Toys\""])
+    }
+    
+    @Test
+    func clearFiltersShowsAllOrders() async{
+        let repo = MockOrderRepository()
+        let viewModel = OrderListView.ViewModel(repository:repo)
+        
+        await viewModel.loadOrders()
+        viewModel.filter = "Good Toys"
+        
+        viewModel.clearFilters()
+        
+        #expect(viewModel.activeLabels.isEmpty)
+        #expect(viewModel.matchingOrders.count == 2)
+    }
 }
