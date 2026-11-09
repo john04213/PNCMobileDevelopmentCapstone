@@ -71,7 +71,7 @@ struct OrderListView: View {
                 }
                 .overlay{
                     if viewModel.matchingOrders.isEmpty{
-                        EmptyStateView(message: "No orders match \"\(viewModel.filter)\".Tap Clear all to see all orders.")
+                        EmptyStateView(message: "No orders match \"\(viewModel.filter)\". Tap Clear all to see all orders.")
                     }
                 }
                 if let selected = viewModel.selectedOrder {
