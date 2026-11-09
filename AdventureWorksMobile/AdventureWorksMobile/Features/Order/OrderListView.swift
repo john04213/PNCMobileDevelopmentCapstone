@@ -59,7 +59,7 @@ struct OrderListView: View {
                         }
                     }
                     .onTapGesture {
-                        self.viewModel.selectedOrder = order
+                        self.viewModel.toggleSelection(of: order)
                     }
                 }
                 .refreshable {
@@ -86,6 +86,8 @@ struct OrderListView: View {
                                 Image(systemName: "xmark")
                                     .frame(minWidth: 44, minHeight: 44)
                             }
+                            .accessibilityLabel("Close")
+                            .accessibilityIdentifier("closeSelectedOrderButton")
                         }
                         Text("\(selected.storeName) · \(viewModel.quantity(order: selected)) item\(viewModel.plural(order: selected))" )
                             .lineLimit(1)
@@ -147,6 +149,14 @@ extension OrderListView {
             }
         }
         var selectedOrder: Order? = nil
+        
+        func toggleSelection(of order: Order ) {
+            if selectedOrder == order{
+                selectedOrder = nil
+            } else {
+                selectedOrder = order
+            }
+        }
         
         func loadOrders() async {
             guard !isLoading else {return}

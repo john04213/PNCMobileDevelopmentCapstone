@@ -131,4 +131,17 @@ struct OrderListViewModelTest {
         #expect(viewModel.orders.count == 2)
         
     }
+    
+    @Test
+    func tappingSelectedOrderAgainClosesThePanel() async {
+        let repo = MockOrderRepository()
+        let viewModel = OrderListView.ViewModel(repository: repo)
+        
+        await viewModel.loadOrders()
+        let order = viewModel.orders[0]
+        viewModel.toggleSelection(of: order)
+        #expect(viewModel.selectedOrder == order)
+        viewModel.toggleSelection(of: order)
+        #expect(viewModel.selectedOrder == nil)
+    }
 }
