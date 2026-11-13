@@ -107,6 +107,7 @@ struct OrderListView: View {
                 }
             }
         }
+        .navigationTitle("Orders")
         .task {
             await viewModel.loadOrders()
         }

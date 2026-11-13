@@ -113,6 +113,7 @@ struct ProductListView: View {
                 }
             }
         }
+        .navigationTitle("Products")
         .task {
             await viewModel.loadProducts()
         }

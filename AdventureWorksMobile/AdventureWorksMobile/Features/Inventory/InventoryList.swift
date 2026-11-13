@@ -210,6 +210,7 @@ struct InventoryList: View {
                 }
                 
             }
+            .navigationTitle("Inventory")
             .task {
                 await viewModel.loadProducts()
             }
