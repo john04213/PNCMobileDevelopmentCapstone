@@ -60,12 +60,13 @@ struct EmployeeProfileView: View {
                                     Text(entry.departmentName)
                                         .bold()
                                     Text(entry.departmentGroup)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.primary)
                                     Text("\(entry.shiftName) shift · \(entry.startDateText) to \(entry.endDateText)")
                                         .font(.caption)
-                                        .foregroundStyle(.secondary)
+                                        .foregroundStyle(.primary)
                                 }
                                 .accessibilityElement(children: .combine)
+                                .accessibilityLabel("\(entry.departmentName), \(entry.departmentGroup), \(entry.shiftName) shift, \(entry.startDateText) to \(entry.endDateText)")
                             }
                         }
                     }

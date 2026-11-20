@@ -9,9 +9,16 @@ import SwiftUI
 
 struct EmployeeListView: View {
     @State private var viewModel: ViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     init(repository: any EmployeeRepositoryProtocol) {
         viewModel = ViewModel(repository: repository)
+    }
+
+    private var filterLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+        ? AnyLayout(VStackLayout(alignment: .leading))
+        : AnyLayout(HStackLayout())
     }
 
     var body: some View {
@@ -36,9 +43,12 @@ struct EmployeeListView: View {
                     }
                 })
             case .loaded:
-                HStack {
+                filterLayout {
                     Text("Filter")
+                        .accessibilityHidden(true)
                     TextField("Name, job title, or department", text: $viewModel.filter)
+                        .accessibilityLabel("Filter")
+                        .accessibilityHint("Name, job title, or department")
                 }
                 .padding()
                 List(viewModel.matchingEmployees) { employee in
