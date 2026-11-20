@@ -16,6 +16,9 @@ struct EmptyStateView: View {
             Text(message)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            AccessibilityNotification.Announcement(message).post()
+        }
 
     }
 }
