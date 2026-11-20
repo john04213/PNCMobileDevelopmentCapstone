@@ -30,6 +30,10 @@ struct InventoryList: View {
         ? AnyLayout(VStackLayout())
         : AnyLayout(HStackLayout())
     }
+
+    private var showDetailsOnly: Bool {
+        dynamicTypeSize.isAccessibilitySize && viewModel.selectedProduct != nil
+    }
     
     var body: some View {
         ZStack {
@@ -62,177 +66,181 @@ struct InventoryList: View {
                         }
                     )
                 case .loaded:
-                    filterLayout {
-                        Text("Filter")
-                            .accessibilityHidden(true)
-                        TextField(
-                            "Product Name or Location",
-                            text: $viewModel.criteria.searchText
+                    if !showDetailsOnly {
+                        filterLayout {
+                            Text("Filter")
+                                .accessibilityHidden(true)
+                            TextField(
+                                "Product Name or Location",
+                                text: $viewModel.criteria.searchText
+                            )
+                            .accessibilityLabel("Filter")
+                            .accessibilityHint("Product Name or Location")
+                        }
+                        .padding()
+                        ActiveFiltersBar(
+                            labels: viewModel.activeLabels,
+                            clearAll: { viewModel.clearFilters() }
                         )
-                        .accessibilityLabel("Filter")
-                        .accessibilityHint("Product Name or Location")
-                    }
-                    .padding()
-                    ActiveFiltersBar(
-                        labels: viewModel.activeLabels,
-                        clearAll: { viewModel.clearFilters() }
-                    )
-                    List(viewModel.matchingProducts) { product in
-                        HStack(alignment: .center) {
-                            VStack(alignment: .leading) {
-                                Text(product.productName)
-                                Text(
-                                    "\(product.locationName) · Shelf \(product.shelf) · Bin \(product.bin)"
-                                )
-                                .foregroundStyle(.primary)
-                                if viewModel.isLowStock(product: product) {
-                                    HStack {
-                                        Image(
-                                            systemName: "exclamationmark.triangle"
-                                        )
-                                        .foregroundColor(.brown)
-                                        Text(
-                                            "Low stock · Reorder at \(product.reorderPoint)"
-                                        )
+                        List(viewModel.matchingProducts) { product in
+                            HStack(alignment: .center) {
+                                VStack(alignment: .leading) {
+                                    Text(product.productName)
+                                    Text(
+                                        "\(product.locationName) · Shelf \(product.shelf) · Bin \(product.bin)"
+                                    )
+                                    .foregroundStyle(.primary)
+                                    if viewModel.isLowStock(product: product) {
+                                        HStack {
+                                            Image(
+                                                systemName: "exclamationmark.triangle"
+                                            )
+                                            .foregroundColor(.brown)
+                                            Text(
+                                                "Low stock · Reorder at \(product.reorderPoint)"
+                                            )
                                         
+                                        }
                                     }
                                 }
+                                Spacer()
+                                Text("\(product.quantity)")
                             }
-                            Spacer()
-                            Text("\(product.quantity)")
+                            .onTapGesture {
+                                self.viewModel.selectedProduct = product
+                                count = product.quantity
+                                AccessibilityNotification.Announcement("Adjusting quantity for \(product.productName). Current quantity \(product.quantity).").post()
+                            }
+                            .accessibilityElement(children: .combine)
+                            .accessibilityLabel("\(product.productName), \(product.locationName), shelf \(product.shelf), bin \(product.bin), quantity \(product.quantity)" + (viewModel.isLowStock(product: product) ? ", low stock, reorder at \(product.reorderPoint)" : ""))
+                            .accessibilityAddTraits(.isButton)
+                            .accessibilityHint("Opens quantity adjustment")
                         }
-                        .onTapGesture {
-                            self.viewModel.selectedProduct = product
-                            count = product.quantity
-                            AccessibilityNotification.Announcement("Adjusting quantity for \(product.productName). Current quantity \(product.quantity).").post()
+                        .refreshable {
+                            await viewModel.loadProducts()
                         }
-                        .accessibilityElement(children: .combine)
-                        .accessibilityLabel("\(product.productName), \(product.locationName), shelf \(product.shelf), bin \(product.bin), quantity \(product.quantity)" + (viewModel.isLowStock(product: product) ? ", low stock, reorder at \(product.reorderPoint)" : ""))
-                        .accessibilityAddTraits(.isButton)
-                        .accessibilityHint("Opens quantity adjustment")
-                    }
-                    .refreshable {
-                        await viewModel.loadProducts()
-                    }
-                    .overlay{
-                        if viewModel.matchingProducts.isEmpty{
-                            EmptyStateView(message:"No matching inventory. Tap clear all to see everything" )
+                        .overlay{
+                            if viewModel.matchingProducts.isEmpty{
+                                EmptyStateView(message:"No matching inventory. Tap clear all to see everything" )
+                            }
                         }
                     }
                     if let selected = viewModel.selectedProduct {
-                        ScrollView {
-                        VStack {
-                            HStack {
-                                Button(action: {
-                                    count = 0
-                                    viewModel.selectedProduct = nil
-                                }) {
-                                    Text("Cancel")
-                                        .foregroundStyle(.blue)
-                                }
-                                Spacer()
-                                Text("Adjust quantity")
-                                    .bold()
-                                    .accessibilityAddTraits(.isHeader)
-                                Spacer()
-                                Button(action: {
-                                    withAnimation {
-                                        showPopup = true
+                            VStack {
+                                HStack {
+                                    Button(action: {
+                                        count = 0
+                                        viewModel.selectedProduct = nil
+                                        AccessibilityNotification.Announcement("Adjustment cancelled").post()
+                                    }) {
+                                        Text("Cancel")
+                                            .foregroundStyle(.blue)
                                     }
-                                    AccessibilityNotification.Announcement("Are you sure? This will update the stock of the specified inventory item.").post()
-                                    Task {
-                                        await viewModel.waitForFalse { self.showPopup }
-                                        if confirmUpdate {
-                                            let invItem = InventoryElement(
-                                                productId: selected.productId,
-                                                productName: selected.productName,
-                                                productNumber: selected.productNumber,
-                                                safetyStockLevel: selected.safetyStockLevel,
-                                                reorderPoint: selected.reorderPoint,
-                                                locationId: selected.locationId,
-                                                locationName: selected.locationName,
-                                                shelf: selected.shelf,
-                                                bin: selected.bin,
-                                                quantity: count
-                                            )
-                                            await viewModel.updateProduct(item: invItem)
-                                            await viewModel.loadProducts()
-                                            confirmUpdate = false
-                                            
-                                            count = 0
-                                            viewModel.selectedProduct = nil
+                                    Spacer()
+                                    Text("Adjust quantity")
+                                        .bold()
+                                        .accessibilityAddTraits(.isHeader)
+                                    Spacer()
+                                    Button(action: {
+                                        withAnimation {
+                                            showPopup = true
+                                        }
+                                        AccessibilityNotification.Announcement("Are you sure? This will update the stock of the specified inventory item.").post()
+                                        Task {
+                                            await viewModel.waitForFalse { self.showPopup }
+                                            if confirmUpdate {
+                                                let invItem = InventoryElement(
+                                                    productId: selected.productId,
+                                                    productName: selected.productName,
+                                                    productNumber: selected.productNumber,
+                                                    safetyStockLevel: selected.safetyStockLevel,
+                                                    reorderPoint: selected.reorderPoint,
+                                                    locationId: selected.locationId,
+                                                    locationName: selected.locationName,
+                                                    shelf: selected.shelf,
+                                                    bin: selected.bin,
+                                                    quantity: count
+                                                )
+                                                await viewModel.updateProduct(item: invItem)
+                                                await viewModel.loadProducts()
+                                                confirmUpdate = false
+                                                
+                                                count = 0
+                                                viewModel.selectedProduct = nil
+                                            }
+                                        }
+                                    }) {
+                                        Text("Save")
+                                            .foregroundStyle(.blue)
+                                    }
+                                }
+                                .padding(.horizontal)
+                                .padding(.bottom)
+                                
+                                ScrollView{
+                                    Text(selected.productName)
+                                        .bold()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal)
+                                    Text("\(selected.locationName) · Shelf \(selected.shelf) · Bin \(selected.bin)")
+                                        .foregroundStyle(.primary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal)
+                                        .padding(.bottom, 8)
+                                    Text("New quantity")
+                                        .bold()
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.horizontal)
+                                    HStack {
+                                        Button(action: {
+                                            count > 0 ? count -= 1 : ()
+                                            AccessibilityNotification.Announcement("New quantity \(count)").post()
+                                        }) {
+                                            Image(systemName: "minus.circle")
+                                                .font(.largeTitle)
+                                                .foregroundStyle(.gray)
+                                                .accessibilityLabel("Decrease quantity")
+                                        }
+                                        Spacer()
+                                        Text("\(count)")
+                                            .font(.largeTitle.bold())
+                                            .frame(minWidth: 60)
+                                        Spacer()
+                                        Button(action: {
+                                            count += 1
+                                            AccessibilityNotification.Announcement("New quantity \(count)").post()
+                                        }) {
+                                            Image(systemName: "plus.circle")
+                                                .font(.largeTitle)
+                                                .foregroundStyle(.gray)
+                                                .accessibilityLabel("Increase quantity")
                                         }
                                     }
-                                }) {
-                                    Text("Save")
-                                        .foregroundStyle(.blue)
+                                    .padding(.horizontal)
+                                    Divider()
+                                    HStack {
+                                        Text("Current quantity")
+                                        Spacer()
+                                        Text(String(selected.quantity))
+                                            .bold()
+                                    }
+                                    .padding(.horizontal)
+                                    Divider()
+                                    HStack {
+                                        Text("Change")
+                                        Spacer()
+                                        if selected.quantity != count {
+                                            Text("Change \(count - selected.quantity)")
+                                                .bold()
+                                        }
+                                        else {
+                                            Text("No change")
+                                                .bold()
+                                        }
+                                    }
+                                    .padding(.horizontal)
                                 }
                             }
-                            .padding(.horizontal)
-                            .padding(.bottom)
-                            Text(selected.productName)
-                                .bold()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                            Text("\(selected.locationName) · Shelf \(selected.shelf) · Bin \(selected.bin)")
-                                .foregroundStyle(.primary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                                .padding(.bottom, 8)
-                            Text("New quantity")
-                                .bold()
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.horizontal)
-                            HStack {
-                                Button(action: {
-                                    count > 0 ? count -= 1 : ()
-                                    AccessibilityNotification.Announcement("New quantity \(count)").post()
-                                }) {
-                                    Image(systemName: "minus.circle")
-                                        .font(.largeTitle)
-                                        .foregroundStyle(.gray)
-                                        .accessibilityLabel("Decrease quantity")
-                                }
-                                Spacer()
-                                Text("\(count)")
-                                    .font(.largeTitle.bold())
-                                    .frame(minWidth: 60)
-                                Spacer()
-                                Button(action: {
-                                    count += 1
-                                    AccessibilityNotification.Announcement("New quantity \(count)").post()
-                                }) {
-                                    Image(systemName: "plus.circle")
-                                        .font(.largeTitle)
-                                        .foregroundStyle(.gray)
-                                        .accessibilityLabel("Increase quantity")
-                                }
-                            }
-                            .padding(.horizontal)
-                            Divider()
-                            HStack {
-                                Text("Current quantity")
-                                Spacer()
-                                Text(String(selected.quantity))
-                                    .bold()
-                            }
-                            .padding(.horizontal)
-                            Divider()
-                            HStack {
-                                Text("Change")
-                                Spacer()
-                                if selected.quantity != count {
-                                    Text("Change \(count - selected.quantity)")
-                                        .bold()
-                                }
-                                else {
-                                    Text("No change")
-                                        .bold()
-                                }
-                            }
-                            .padding(.horizontal)
-                        }
-                        }
                     }
                 }
                 
