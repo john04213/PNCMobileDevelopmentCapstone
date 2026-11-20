@@ -11,9 +11,15 @@ struct LoadingView: View {
     var message: String
     var body: some View {
         VStack(){
-            ProgressView(message)
+            ProgressView {
+                Text(message)
+                    .foregroundStyle(.primary)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            AccessibilityNotification.Announcement(message).post()
+        }
     }
 }
 
