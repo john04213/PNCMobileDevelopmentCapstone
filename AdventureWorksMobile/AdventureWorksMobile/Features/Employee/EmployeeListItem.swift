@@ -18,17 +18,17 @@ struct EmployeeListItem: View {
                 Text(employee.fullName)
                     .bold()
                 Text(employee.jobTitle)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                 Text("\(employee.department) · \(employee.shift) shift")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
                 Text("Hired \(employee.hireDateText) · ID \(employee.employeeId)")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.primary)
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(employee.fullName), \(employee.jobTitle), \(employee.department), \(employee.shift) shift, hired \(employee.hireDateText)")
+        .accessibilityLabel("\(employee.fullName), \(employee.jobTitle), \(employee.department), \(employee.shift) shift, hired \(employee.hireDateText), ID \(employee.employeeId)")
     }
 }
 
