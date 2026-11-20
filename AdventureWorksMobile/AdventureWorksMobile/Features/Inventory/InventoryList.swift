@@ -13,8 +13,22 @@ struct InventoryList: View {
     @State private var showPopup = false
     @State private var confirmUpdate = false
     
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    
     init(repository: any RepositoryProtocol<InventoryElement>) {
         viewModel = ViewModel(repository: repository)
+    }
+
+    private var filterLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+        ? AnyLayout(VStackLayout(alignment: .leading))
+        : AnyLayout(HStackLayout())
+    }
+
+    private var popupButtonLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+        ? AnyLayout(VStackLayout())
+        : AnyLayout(HStackLayout())
     }
     
     var body: some View {
@@ -48,12 +62,15 @@ struct InventoryList: View {
                         }
                     )
                 case .loaded:
-                    HStack {
+                    filterLayout {
                         Text("Filter")
+                            .accessibilityHidden(true)
                         TextField(
                             "Product Name or Location",
                             text: $viewModel.criteria.searchText
                         )
+                        .accessibilityLabel("Filter")
+                        .accessibilityHint("Product Name or Location")
                     }
                     .padding()
                     ActiveFiltersBar(
@@ -64,12 +81,10 @@ struct InventoryList: View {
                         HStack(alignment: .center) {
                             VStack(alignment: .leading) {
                                 Text(product.productName)
-                                    .lineLimit(1)
                                 Text(
                                     "\(product.locationName) · Shelf \(product.shelf) · Bin \(product.bin)"
                                 )
-                                .lineLimit(1)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.primary)
                                 if viewModel.isLowStock(product: product) {
                                     HStack {
                                         Image(
@@ -89,7 +104,12 @@ struct InventoryList: View {
                         .onTapGesture {
                             self.viewModel.selectedProduct = product
                             count = product.quantity
+                            AccessibilityNotification.Announcement("Adjusting quantity for \(product.productName). Current quantity \(product.quantity).").post()
                         }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(product.productName), \(product.locationName), shelf \(product.shelf), bin \(product.bin), quantity \(product.quantity)" + (viewModel.isLowStock(product: product) ? ", low stock, reorder at \(product.reorderPoint)" : ""))
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityHint("Opens quantity adjustment")
                     }
                     .refreshable {
                         await viewModel.loadProducts()
@@ -100,6 +120,7 @@ struct InventoryList: View {
                         }
                     }
                     if let selected = viewModel.selectedProduct {
+                        ScrollView {
                         VStack {
                             HStack {
                                 Button(action: {
@@ -112,11 +133,13 @@ struct InventoryList: View {
                                 Spacer()
                                 Text("Adjust quantity")
                                     .bold()
+                                    .accessibilityAddTraits(.isHeader)
                                 Spacer()
                                 Button(action: {
                                     withAnimation {
                                         showPopup = true
                                     }
+                                    AccessibilityNotification.Announcement("Are you sure? This will update the stock of the specified inventory item.").post()
                                     Task {
                                         await viewModel.waitForFalse { self.showPopup }
                                         if confirmUpdate {
@@ -152,8 +175,7 @@ struct InventoryList: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
                             Text("\(selected.locationName) · Shelf \(selected.shelf) · Bin \(selected.bin)")
-                                .lineLimit(1)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(.primary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal)
                                 .padding(.bottom, 8)
@@ -164,22 +186,26 @@ struct InventoryList: View {
                             HStack {
                                 Button(action: {
                                     count > 0 ? count -= 1 : ()
+                                    AccessibilityNotification.Announcement("New quantity \(count)").post()
                                 }) {
                                     Image(systemName: "minus.circle")
-                                        .font(.system(size: 60))
+                                        .font(.largeTitle)
                                         .foregroundStyle(.gray)
+                                        .accessibilityLabel("Decrease quantity")
                                 }
                                 Spacer()
                                 Text("\(count)")
-                                    .font(.system(size: 60, weight: .bold))
+                                    .font(.largeTitle.bold())
                                     .frame(minWidth: 60)
                                 Spacer()
                                 Button(action: {
                                     count += 1
+                                    AccessibilityNotification.Announcement("New quantity \(count)").post()
                                 }) {
                                     Image(systemName: "plus.circle")
-                                        .font(.system(size: 60))
+                                        .font(.largeTitle)
                                         .foregroundStyle(.gray)
+                                        .accessibilityLabel("Increase quantity")
                                 }
                             }
                             .padding(.horizontal)
@@ -206,6 +232,7 @@ struct InventoryList: View {
                             }
                             .padding(.horizontal)
                         }
+                        }
                     }
                 }
                 
@@ -227,8 +254,8 @@ struct InventoryList: View {
                     Text("This will update the stock of the specified inventory item.")
                         .font(.body)
                         .multilineTextAlignment(.center)
-                        .foregroundColor(.gray)
-                    HStack {
+                        .foregroundColor(.primary)
+                    popupButtonLayout {
                         Button("No") {
                             withAnimation {
                                 showPopup = false
@@ -236,7 +263,7 @@ struct InventoryList: View {
                         }
                         .padding(.horizontal, 30)
                         .padding(.vertical, 10)
-                        .background(.red)
+                        .background(Color(red: 0.70, green: 0.10, blue: 0.10))
                         .foregroundColor(.white)
                         .cornerRadius(8)
                         Button("Yes") {
@@ -247,17 +274,18 @@ struct InventoryList: View {
                         }
                         .padding(.horizontal, 30)
                         .padding(.vertical, 10)
-                        .background(.green)
+                        .background(Color(red: 0.0, green: 0.45, blue: 0.20))
                         .foregroundColor(.white)
                         .cornerRadius(8)
                     }
                 }
                 .padding(24)
-                .background(.white)
+                .background(.background)
                 .cornerRadius(16)
                 .shadow(radius: 20)
-                .frame(width: 300)
+                .frame(maxWidth: 300)
                 .transition(.scale.combined(with: .opacity))
+                .accessibilityAddTraits(.isModal)
             }
         }
     }
