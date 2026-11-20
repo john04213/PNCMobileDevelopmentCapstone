@@ -17,17 +17,15 @@ struct UniqueBlockView: View {
             VStack(alignment: .leading) {
                 Text(title)
                     .bold()
-                    .lineLimit(1)
                 if let (sub) = subTitle {
                     Text(sub)
-                        .lineLimit(1)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                 }
             }
             Spacer()
             Text(String(format: "$%.2f", total))
                 .bold()
-                .lineLimit(1)
         }
-    }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title) \(subTitle ?? "") \(String(format: "$%.2f", total))")    }
 }
