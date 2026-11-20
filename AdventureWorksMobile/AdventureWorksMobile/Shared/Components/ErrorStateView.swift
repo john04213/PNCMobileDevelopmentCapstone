@@ -27,6 +27,9 @@ struct ErrorStateView: View{
             
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .onAppear {
+            AccessibilityNotification.Announcement("Error: \(message)").post()
+        }
     }
 }
 
