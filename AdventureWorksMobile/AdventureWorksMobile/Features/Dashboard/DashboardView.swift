@@ -10,79 +10,99 @@ import SwiftUI
 struct DashboardView: View {
     
     @State private var viewModel: ViewModel
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
     
     init(repository: any DashboardRepositoryProtocol) {
         viewModel = ViewModel(repository: repository)
     }
-    var body: some View {
+    
+    private var rowLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+        ? AnyLayout(VStackLayout())
+        : AnyLayout(HStackLayout())
+    }
+    
+    private var dashboardBoxes: some View {
+        // Tapping funcinality needs to be added to the boxes
         VStack {
-            // Tapping funcinality needs to be added to the boxes
-            
-            VStack {
-                HStack {
-                    NavigationLink {
-                        // add link to weekly sales
-                    } label: {
-                        DashboardBox(title: "Weekly Sales",
-                                     systemImage: "dollarsign.circle",
-                                     color: .gray,
-                                     value: viewModel.weekTotal.formatted(.currency(code: "USD")),
-                                     detail: "Last 7 days")
-                    }
-                    .buttonStyle(.plain)
-                    NavigationLink {
-                        // ad dlink to low stock
-                    } label: {
-                        DashboardBox(title: "Low Stock",
-                                     systemImage: "shippingbox",
-                                     color: .gray,
-                                     value: "\(viewModel.lowStock.count)",
-                                     detail: "Products to reorder")
-                    }
-                    .buttonStyle(.plain)
+            rowLayout {
+                NavigationLink {
+                    // add link to weekly sales
+                } label: {
+                    DashboardBox(title: "Weekly Sales",
+                                 systemImage: "dollarsign.circle",
+                                 color: .gray,
+                                 value: viewModel.weekTotal.formatted(.currency(code: "USD")),
+                                 detail: "Last 7 days")
                 }
-                HStack {
-                    NavigationLink {
-                        // add link to strong performer
-                    } label: {
-                        DashboardBox(title: "Strong Performer",
-                                     systemImage: "chart.line.uptrend.xyaxis",
-                                     color: .gray,
-                                     value: viewModel.productSales.first?.productName ?? "No data",
-                                     detail: "Units sold: \(viewModel.productSales.first?.unitsSold ?? 0)")
-                    }
-                    .buttonStyle(.plain)
-                    NavigationLink {
-                        // add link to weak performers
-                    } label: {
-                        DashboardBox(title: "Weak Performer",
-                                     systemImage: "chart.line.downtrend.xyaxis",
-                                     color: .gray,
-                                     value: viewModel.productSales.last?.productName ?? "No data",
-                                     detail: "Units sold: \(viewModel.productSales.last?.unitsSold ?? 0)")
-                    }
-                    .buttonStyle(.plain)
+                .buttonStyle(.plain)
+                NavigationLink {
+                    // ad dlink to low stock
+                } label: {
+                    DashboardBox(title: "Low Stock",
+                                 systemImage: "shippingbox",
+                                 color: .gray,
+                                 value: "\(viewModel.lowStock.count)",
+                                 detail: "Products to reorder")
                 }
+                .buttonStyle(.plain)
             }
-            .padding()
-            
-            // The employee shift list
-            List {
-                Section(header: Text("Day shift")) {
-                    ForEach(viewModel.employees(on: "Day")) { employee in
-                        Text(employee.fullName)
-                    }
+            rowLayout {
+                NavigationLink {
+                    // add link to strong performer
+                } label: {
+                    DashboardBox(title: "Strong Performer",
+                                 systemImage: "chart.line.uptrend.xyaxis",
+                                 color: .gray,
+                                 value: viewModel.productSales.first?.productName ?? "No data",
+                                 detail: "Units sold: \(viewModel.productSales.first?.unitsSold ?? 0)")
                 }
-                Section(header: Text("Evening shift")) {
-                    ForEach(viewModel.employees(on: "Evening")) { employee in
-                        Text(employee.fullName)
-                    }
+                .buttonStyle(.plain)
+                NavigationLink {
+                    // add link to weak performers
+                } label: {
+                    DashboardBox(title: "Weak Performer",
+                                 systemImage: "chart.line.downtrend.xyaxis",
+                                 color: .gray,
+                                 value: viewModel.productSales.last?.productName ?? "No data",
+                                 detail: "Units sold: \(viewModel.productSales.last?.unitsSold ?? 0)")
                 }
-                Section(header: Text("Night shift")) {
-                    ForEach(viewModel.employees(on: "Night")) { employee in
-                        Text(employee.fullName)
-                    }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private var employeeList: some View {
+        // The employee shift list
+        Section(header: Text("Day shift")) {
+            ForEach(viewModel.employees(on: "Day")) { employee in
+                Text(employee.fullName)
+            }
+        }
+        Section(header: Text("Evening shift")) {
+            ForEach(viewModel.employees(on: "Evening")) { employee in
+                Text(employee.fullName)
+            }
+        }
+        Section(header: Text("Night shift")) {
+            ForEach(viewModel.employees(on: "Night")) { employee in
+                Text(employee.fullName)
+            }
+        }
+    }
+    
+    var body: some View {
+        VStack{
+            if dynamicTypeSize.isAccessibilitySize || verticalSizeClass == .compact {
+                List {
+                    dashboardBoxes
+                    employeeList
                 }
+            } else {
+                dashboardBoxes
+                List { employeeList }
             }
         }
         .navigationTitle("Dashboard")
