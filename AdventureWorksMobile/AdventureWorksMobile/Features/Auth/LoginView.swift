@@ -19,68 +19,86 @@ struct LoginView: View {
     @FocusState private var focusedField: Action?
     
     var body: some View {
-        
-        VStack(alignment: . leading, spacing: 12) {
-            
-            Text("Sign in").font(Font.largeTitle.bold())
-            if let reason = authStatus.signOutReason{
-                Text(reason)
-                    .foregroundStyle(.secondary)
-            }
-            Text("Username")
-            TextField("Username", text: $viewModel.credentials.username)
-                .textFieldStyle(.roundedBorder)
-                .textContentType(.username)
-                .focused($focusedField, equals: .usernameField)
-                .submitLabel(.next)
-                .onSubmit{focusedField = .passwordField}
-                .textInputAutocapitalization(.never)
-                .autocorrectionDisabled()
-                .accessibilityIdentifier("usernamefield")
-            Text("Password")
-            SecureField("Password", text: $viewModel.credentials.password)
-                .textFieldStyle(.roundedBorder)
-                .textContentType(.password)
-                .focused($focusedField, equals: .passwordField)
-                .submitLabel(.go)
-                .onSubmit{if !viewModel.loginDisabled {
-                    Task {
-                        await viewModel.login(session: authStatus)
+ 
+        ScrollView {
+            VStack(alignment: .leading, spacing: 12) {
+ 
+                Text("Sign in")
+                    .font(.largeTitle.bold())
+                    .accessibilityAddTraits(.isHeader)
+ 
+                if let reason = authStatus.signOutReason {
+                    Text(reason)
+                        .foregroundStyle(.primary)
+                }
+ 
+                Text("Username")
+                    .accessibilityHidden(true)
+                TextField("Username", text: $viewModel.credentials.username)
+                    .textFieldStyle(.roundedBorder)
+                    .textContentType(.username)
+                    .focused($focusedField, equals: .usernameField)
+                    .submitLabel(.next)
+                    .onSubmit { focusedField = .passwordField }
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .accessibilityLabel("Username")
+                    .accessibilityIdentifier("usernamefield")
+ 
+                Text("Password")
+                    .accessibilityHidden(true)
+                SecureField("Password", text: $viewModel.credentials.password)
+                    .textFieldStyle(.roundedBorder)
+                    .textContentType(.password)
+                    .focused($focusedField, equals: .passwordField)
+                    .submitLabel(.go)
+                    .onSubmit {
+                        if !viewModel.loginDisabled {
+                            Task { await viewModel.login(session: authStatus) }
+                        }
                     }
-                }}
-                .accessibilityIdentifier("passwordfield")
-            
-            
-            
-            Button {
-                Task {
-                    await viewModel.login(session: authStatus)
+                    .accessibilityLabel("Password")
+                    .accessibilityIdentifier("passwordfield")
+ 
+                
+                if !viewModel.errorMessage.isEmpty {
+                    Label {
+                        Text(viewModel.errorMessage)
+                            .foregroundStyle(.primary)
+                    } icon: {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Error: \(viewModel.errorMessage)")
                 }
-            } label: {
-                Group {
-                    if viewModel.isBusy {
-                    ProgressView()
-                } else {
-                    Text("Sign in")
+ 
+                Button {
+                    Task { await viewModel.login(session: authStatus) }
+                } label: {
+                    Group {
+                        if viewModel.isBusy {
+                            HStack(spacing: 8) {
+                                Text("Signing in…")
+                            }
+                        } else {
+                            Text("Sign in")
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
                 }
-                }
-                .frame(maxWidth: .infinity)
+                .buttonStyle(.borderedProminent)
+                .disabled(viewModel.loginDisabled)
+                .accessibilityIdentifier("loginButton")
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(viewModel.loginDisabled)
-            .accessibilityIdentifier("loginButton")
-
-            if !viewModel.errorMessage.isEmpty {
-                Label(viewModel.errorMessage, systemImage:"exclamationmark.triangle")
-                    .foregroundStyle(.red)
-            }
-
-            Spacer()
-
+            .padding(20)
+            .disabled(viewModel.isBusy)
         }
-        .padding(20)
-        .disabled(viewModel.isBusy)
-
+        .scrollBounceBehavior(.basedOnSize)
+        .onChange(of: viewModel.errorMessage) { _, newValue in
+            guard !newValue.isEmpty else { return }
+            AccessibilityNotification.Announcement("Error: \(newValue)").post()
+        }
     }
 
 }

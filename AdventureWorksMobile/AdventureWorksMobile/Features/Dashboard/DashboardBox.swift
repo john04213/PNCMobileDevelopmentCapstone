@@ -22,7 +22,7 @@ struct DashboardBox: View {
                 Text(title)
             }
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.primary)
 
             Text(value)
                 .font(.title2)
@@ -30,13 +30,13 @@ struct DashboardBox: View {
 
             Text(detail)
                 .font(.caption)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.primary)
 
             Spacer()
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
-        .frame(height: 140)
+        .frame(minHeight: 140)
         .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title): \(value), \(detail)")
