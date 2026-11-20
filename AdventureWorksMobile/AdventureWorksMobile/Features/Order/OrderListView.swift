@@ -9,9 +9,27 @@ import SwiftUI
 
 struct OrderListView: View {
     @State private var viewModel: ViewModel
+
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     
     init(repository: any RepositoryProtocol<OrderElement>) {
         viewModel = ViewModel(repository: repository)
+    }
+
+    private var filterLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+        ? AnyLayout(VStackLayout(alignment: .leading))
+        : AnyLayout(HStackLayout())
+    }
+
+    private var rowLayout: AnyLayout {
+        dynamicTypeSize.isAccessibilitySize
+        ? AnyLayout(VStackLayout(alignment: .leading))
+        : AnyLayout(HStackLayout(alignment: .center))
+    }
+
+    private var showDetailsOnly: Bool {
+        dynamicTypeSize.isAccessibilitySize && viewModel.selectedOrder != nil
     }
     
     var body: some View {
@@ -33,45 +51,52 @@ struct OrderListView: View {
                 }
             })
             case .loaded:
-                HStack {
-                    Text("Filter")
-                    TextField("Order number or store", text: $viewModel.filter)
-                }
-                .padding()
-                ActiveFiltersBar(
-                    labels: viewModel.activeLabels,
-                    clearAll: { viewModel.clearFilters() }
-                )
-                List(viewModel.matchingOrders) { order in
-                    HStack (alignment: .center) {
-                        VStack(alignment: .leading) {
-                            Text(order.name)
-                                .bold()
-                                .lineLimit(1)
-                            Text("\(order.storeName) · \(viewModel.quantity(order: order)) item\(viewModel.plural(order: order))" )
-                                .lineLimit(1)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        VStack (alignment: .trailing) {
-                            Text("\(String(format: "$%.2f", viewModel.totalPrice(order: order)))")
-                                .bold()
-                                .lineLimit(1)
-                            Text("[\(order.orderDate.replacingOccurrences(of: "T00:00:00", with: ""))]")
-                                .lineLimit(1)
-                                .foregroundStyle(.secondary)
-                        }
+                if !showDetailsOnly {
+                    filterLayout {
+                        Text("Filter")
+                            .accessibilityHidden(true)
+                        TextField("Order number or store", text: $viewModel.filter)
+                            .accessibilityLabel("Filter")
+                            .accessibilityHint("Order number or store")
                     }
-                    .onTapGesture {
-                        self.viewModel.toggleSelection(of: order)
+                    .padding()
+                    ActiveFiltersBar(
+                        labels: viewModel.activeLabels,
+                        clearAll: { viewModel.clearFilters() }
+                    )
+                    List(viewModel.matchingOrders) { order in
+                        rowLayout {
+                            VStack(alignment: .leading) {
+                                Text(order.name)
+                                    .bold()
+                                Text("\(order.storeName) · \(viewModel.quantity(order: order)) item\(viewModel.plural(order: order))" )
+                                    .foregroundStyle(.primary)
+                            }
+                            Spacer()
+                            VStack (alignment: dynamicTypeSize.isAccessibilitySize ? .leading : .trailing) {
+                                Text("\(String(format: "$%.2f", viewModel.totalPrice(order: order)))")
+                                    .bold()
+                                Text("[\(order.orderDate.replacingOccurrences(of: "T00:00:00", with: ""))]")
+                                    .foregroundStyle(.primary)
+                            }
+                        }
+                        .onTapGesture {
+                            self.viewModel.toggleSelection(of: order)
+                            AccessibilityNotification.Announcement(self.viewModel.selectedOrder == nil ? "Order details closed" : "Showing details for \(order.name)").post()
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("\(order.name), \(order.storeName), \(viewModel.quantity(order: order)) item\(viewModel.plural(order: order)), total \(String(format: "$%.2f", viewModel.totalPrice(order: order))), ordered \(order.orderDate.replacingOccurrences(of: "T00:00:00", with: ""))")
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityAddTraits(viewModel.selectedOrder == order ? .isSelected : [])
+                        .accessibilityHint("Shows the order's items")
                     }
-                }
-                .refreshable {
-                    await viewModel.loadOrders()
-                }
-                .overlay{
-                    if viewModel.matchingOrders.isEmpty{
-                        EmptyStateView(message: "No orders match \"\(viewModel.filter)\". Tap Clear all to see all orders.")
+                    .refreshable {
+                        await viewModel.loadOrders()
+                    }
+                    .overlay{
+                        if viewModel.matchingOrders.isEmpty{
+                            EmptyStateView(message: "No orders match \"\(viewModel.filter)\". Tap Clear all to see all orders.")
+                        }
                     }
                 }
                 if let selected = viewModel.selectedOrder {
@@ -82,10 +107,13 @@ struct OrderListView: View {
                                 Text(selected.name)
                                     .font(Font.title2)
                                     .bold()
+                                    .padding(.horizontal, 44)
+                                    .accessibilityAddTraits(.isHeader)
                                 Spacer()
                             }
                             Button {
                                 viewModel.selectedOrder = nil
+                                AccessibilityNotification.Announcement("Order details closed").post()
                             } label : {
                                 Image(systemName: "xmark")
                                     .frame(minWidth: 44, minHeight: 44)
@@ -94,8 +122,7 @@ struct OrderListView: View {
                             .accessibilityIdentifier("closeSelectedOrderButton")
                         }
                         Text("\(selected.storeName) · \(viewModel.quantity(order: selected)) item\(viewModel.plural(order: selected))" )
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.primary)
                             .padding(.bottom, 20)
                         List() {
                             ForEach(selected.lineItems) { lineItem in
