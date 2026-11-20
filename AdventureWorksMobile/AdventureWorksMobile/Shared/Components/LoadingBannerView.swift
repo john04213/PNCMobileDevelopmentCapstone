@@ -15,25 +15,33 @@ struct LoadingBannerView: View {
     let itemName: String
 
     var body: some View {
-        switch state {
+        Group {
+            switch state {
 
-        case .idle, .loading, .empty, .failed:
-            EmptyView()
+            case .idle, .loading, .empty, .failed:
+                EmptyView()
 
-        case .loaded:
-            if !refreshErrorMessage.isEmpty {
-                VStack {
-                    HStack {
-                        Image(systemName: "exclamationmark.triangle.fill")
-                            .foregroundStyle(.red)
-                        banner("Couldn't refresh \(itemName).")
+            case .loaded:
+                if !refreshErrorMessage.isEmpty {
+                    VStack {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle.fill")
+                                .foregroundStyle(.red)
+                                .accessibilityHidden(true)
+                            banner("Couldn't refresh \(itemName).")
+                        }
+                        banner(refreshErrorMessage)
                     }
-                    banner(refreshErrorMessage)
+                } else if isLoading {
+                    banner("Refreshing \(itemName)...")
+                } else {
+                    banner("\(itemName.capitalized) loaded · Pull down to refresh")
                 }
-            } else if isLoading {
-                banner("Refreshing \(itemName)...")
-            } else {
-                banner("\(itemName.capitalized) loaded · Pull down to refresh")
+            }
+        }
+        .onChange(of: refreshErrorMessage) { _, newValue in
+            if !newValue.isEmpty {
+                AccessibilityNotification.Announcement("Couldn't refresh \(itemName). \(newValue)").post()
             }
         }
     }
@@ -43,7 +51,7 @@ struct LoadingBannerView: View {
             Text(text).font(.subheadline)
             Spacer()
         }
-        .foregroundStyle(.secondary)
+        .foregroundStyle(.primary)
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
