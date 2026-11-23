@@ -186,11 +186,15 @@ extension DashboardView {
                 }
                 
                 func loadData() async {
-                    async let sales: Void = loadSales()
-                    async let bestWorst: Void = loadBestWorst()
-                    async let low: Void = loadLowStock()
-                    async let shifts: Void = loadShifts()
-                    _ = await (sales, bestWorst, low, shifts)
+                    // The loads run in their own Task. SwiftUI cancels the Dashboard's .task when a
+                    // detail screen opens, and a cancelled load would show that screen as failed.
+                    await Task {
+                        async let sales: Void = loadSales()
+                        async let bestWorst: Void = loadBestWorst()
+                        async let low: Void = loadLowStock()
+                        async let shifts: Void = loadShifts()
+                        _ = await (sales, bestWorst, low, shifts)
+                    }.value
                     
                 }
                 
