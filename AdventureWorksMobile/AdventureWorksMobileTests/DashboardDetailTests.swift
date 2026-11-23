@@ -87,4 +87,58 @@ struct DashboardDetailTests {
         #expect(vm.strongPerformer == nil)
         #expect(vm.weakPerformer == nil)
     }
+
+    @Test
+    func leavingTheDashboardWhileItLoadsDoesNotFailTheTiles() async {
+        let repo = WaitingDashboardRepository()
+        let vm = DashboardView.ViewModel(repository: repo)
+        // This is the Dashboard's .task. SwiftUI cancels it when a detail screen opens.
+        let dashboardTask = Task {
+            await vm.loadData()
+        }
+        while !repo.lowStockHasStarted {
+            await Task.yield()
+        }
+
+        dashboardTask.cancel()
+        repo.letLowStockAnswer()
+        await dashboardTask.value
+
+        #expect(vm.lowStockState == LoadState.loaded)
+        #expect(vm.lowStock.count == 1)
+    }
+}
+
+// A repository whose low stock answer waits until the test lets it go.
+// After the wait it checks for cancellation, the way a real network request does.
+@MainActor
+private final class WaitingDashboardRepository: @MainActor DashboardRepositoryProtocol {
+    var lowStockHasStarted = false
+    private var waiting: CheckedContinuation<Void, Never>?
+
+    func letLowStockAnswer() {
+        waiting?.resume()
+        waiting = nil
+    }
+
+    func weeklySales() async throws -> [DailySales] {
+        return []
+    }
+
+    func bestWorst() async throws -> [ProductSales] {
+        return []
+    }
+
+    func lowStock() async throws -> [ProductStock] {
+        lowStockHasStarted = true
+        await withCheckedContinuation { continuation in
+            waiting = continuation
+        }
+        try Task.checkCancellation()
+        return [ProductStock(productId: 1, productName: "Bearing Balls", stockLevel: 0, reorderPoint: 200)]
+    }
+
+    func shifts() async throws -> [ShiftEmployee] {
+        return []
+    }
 }
