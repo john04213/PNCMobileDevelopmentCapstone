@@ -24,11 +24,10 @@ struct DashboardView: View {
     }
     
     private var dashboardBoxes: some View {
-        // Tapping funcinality needs to be added to the boxes
         VStack {
             rowLayout {
                 NavigationLink {
-                    // add link to weekly sales
+                    WeeklySalesDetailView(viewModel: viewModel)
                 } label: {
                     DashboardBox(title: "Weekly Sales",
                                  systemImage: "dollarsign.circle",
@@ -38,7 +37,7 @@ struct DashboardView: View {
                 }
                 .buttonStyle(.plain)
                 NavigationLink {
-                    // ad dlink to low stock
+                    LowStockDetailView(viewModel: viewModel)
                 } label: {
                     DashboardBox(title: "Low Stock",
                                  systemImage: "shippingbox",
@@ -50,7 +49,10 @@ struct DashboardView: View {
             }
             rowLayout {
                 NavigationLink {
-                    // add link to strong performer
+                    ProductPerformanceDetailView(viewModel: viewModel,
+                                                 title: "Strong Performer",
+                                                 summary: "Selling well",
+                                                 isStrong: true)
                 } label: {
                     DashboardBox(title: "Strong Performer",
                                  systemImage: "chart.line.uptrend.xyaxis",
@@ -60,7 +62,10 @@ struct DashboardView: View {
                 }
                 .buttonStyle(.plain)
                 NavigationLink {
-                    // add link to weak performers
+                    ProductPerformanceDetailView(viewModel: viewModel,
+                                                 title: "Weak Performer",
+                                                 summary: "Selling slowly",
+                                                 isStrong: false)
                 } label: {
                     DashboardBox(title: "Weak Performer",
                                  systemImage: "chart.line.downtrend.xyaxis",
@@ -132,12 +137,46 @@ extension DashboardView {
         var productSales: [ProductSales] = []
         var shiftEmployees: [ShiftEmployee] = []
             
+            // The days the Weekly Sales tile adds up: the last 7 days of sales.
+            var lastWeekSales: [DailySales] {
+                Array(dailySales.suffix(7))
+            }
+
             var weekTotal: Double {
                 var total = 0.0
-                for day in dailySales.suffix(7) {
+                for day in lastWeekSales {
                     total += day.totalSales
                 }
                 return total
+            }
+
+            var weekProfit: Double {
+                var total = 0.0
+                for day in lastWeekSales {
+                    total += day.totalProfit
+                }
+                return total
+            }
+
+            // The low stock products, the one furthest below its reorder point first.
+            var lowStockByShortfall: [ProductStock] {
+                lowStock.sorted { first, second in
+                    let firstShortfall = first.reorderPoint - first.stockLevel
+                    let secondShortfall = second.reorderPoint - second.stockLevel
+                    if firstShortfall == secondShortfall {
+                        return first.productName < second.productName
+                    }
+                    return firstShortfall > secondShortfall
+                }
+            }
+
+            // The best and the worst seller: the first and last product the API sends.
+            var strongPerformer: ProductSales? {
+                productSales.first
+            }
+
+            var weakPerformer: ProductSales? {
+                productSales.last
             }
                 
                 func employees(on shift: String) -> [ShiftEmployee] {
